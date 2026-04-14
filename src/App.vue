@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button as VantButton } from 'vant'
-import { useUserStore } from './stores/user'
+import { useUserStore } from './stores'
 
 const userStore = useUserStore()
 const onLogin = () => {
