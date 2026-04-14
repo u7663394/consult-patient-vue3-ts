@@ -1,19 +1,26 @@
 <script setup lang="ts">
 import { Button as VantButton } from 'vant'
+import { useUserStore } from './stores/user'
+
+const userStore = useUserStore()
+const onLogin = () => {
+  userStore.setUser({
+    id: '1',
+    account: '张三',
+    mobile: '12345678901',
+    avatar: 'demo.png',
+    token: 'abc123}',
+  })
+}
+const onLogout = () => {
+  userStore.delUser()
+}
 </script>
 
 <template>
-  <vant-button type="primary">主要按钮</vant-button>
-  <div class="main">我是 main 区域</div>
-  <div class="footer">我是 footer 区域</div>
+  <div>用户信息: {{ userStore.user }}</div>
+  <vant-button type="primary" @click="onLogin">模拟登陆</vant-button>
+  <vant-button type="danger" @click="onLogout">模拟退出</vant-button>
 </template>
 
-<style scoped>
-.main {
-  background-color: var(--cp-primary);
-}
-
-.footer {
-  background-color: var(--footer-color);
-}
-</style>
+<style scoped></style>
