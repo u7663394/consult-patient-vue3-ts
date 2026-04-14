@@ -1,4 +1,22 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { mobileRules, passwordRules } from '@/utils/rules'
+import { showToast } from 'vant'
+import { ref } from 'vue'
+/**
+ * 表单校验 + 提交
+ *   1. 判断是否同意协议
+ *   2. 登录逻辑
+ */
+const mobile = ref('')
+const password = ref('')
+const agree = ref(false)
+const onSubmit = () => {
+  // 1. 判断是否同意协议
+  if (!agree.value) return showToast('请同意用户协议和隐私条款')
+  // 2. 登录逻辑
+  console.log('Login logic')
+}
+</script>
 
 <template>
   <div class="login-page">
@@ -16,11 +34,21 @@
       </a>
     </div>
     <!-- 表单 -->
-    <van-form autocomplete="off">
-      <van-field placeholder="请输入手机号" type="tel"></van-field>
-      <van-field placeholder="请输入密码" type="password"></van-field>
+    <van-form autocomplete="off" @submit="onSubmit">
+      <van-field
+        v-model="mobile"
+        :rules="mobileRules"
+        placeholder="请输入手机号"
+        type="tel"
+      ></van-field>
+      <van-field
+        v-model="password"
+        :rules="passwordRules"
+        placeholder="请输入密码"
+        type="password"
+      ></van-field>
       <div class="cp-cell">
-        <van-checkbox>
+        <van-checkbox v-model="agree">
           <span>我已同意</span>
           <a href="javascript:;">用户协议</a>
           <span>及</span>
@@ -28,7 +56,12 @@
         </van-checkbox>
       </div>
       <div class="cp-cell">
-        <van-button block round type="primary">登 录</van-button>
+        <!-- 
+         1. native-type="submit": 设置 button 组件为原生 submit 类型按钮。
+         2. 在 van-form 中即可监听 submit 事件处理提交逻辑。
+         3. van-form 会自动触发整体表单校验, 无需手动调用校验方法
+        -->
+        <van-button block round type="primary" native-type="submit">登 录</van-button>
       </div>
       <div class="cp-cell">
         <a href="javascript:;">忘记密码？</a>
