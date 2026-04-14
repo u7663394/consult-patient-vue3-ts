@@ -54,7 +54,13 @@ export default instance
 export { baseURL }
 
 // 6. 导出请求函数，方便使用
-export const request = (url: string, method: Method = 'GET', submitData?: object) => {
+type Data<T> = {
+  code: number
+  message: string
+  data: T
+}
+
+export const request = <T>(url: string, method: Method = 'GET', submitData?: object) => {
   const config: AxiosRequestConfig = {
     url,
     method,
@@ -65,5 +71,5 @@ export const request = (url: string, method: Method = 'GET', submitData?: object
   } else {
     config.data = submitData
   }
-  return instance.request(config)
+  return instance.request<unknown, Data<T>>(config)
 }
