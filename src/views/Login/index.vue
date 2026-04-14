@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { loginByPassword } from '@/services/user'
+import { useUserStore } from '@/stores'
 import { mobileRules, passwordRules } from '@/utils/rules'
-import { showToast } from 'vant'
+import { showSuccessToast, showToast } from 'vant'
 import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 /**
  * 表单校验 + 提交
  *   1. 判断是否同意协议
@@ -10,11 +13,20 @@ import { ref } from 'vue'
 const mobile = ref('')
 const password = ref('')
 const agree = ref(false)
-const onSubmit = () => {
+const userStore = useUserStore()
+const router = useRouter()
+const route = useRoute()
+const onSubmit = async () => {
   // 1. 判断是否同意协议
   if (!agree.value) return showToast('请同意用户协议和隐私条款')
   // 2. 登录逻辑
-  console.log('Login logic')
+  const res = await loginByPassword(mobile.value, password.value)
+  // 2.1. 存储用户信息
+  userStore.setUser(res.data)
+  // 2.2. 提示登录成功
+  showSuccessToast('登录成功')
+  // 2.3. 有 returnUrl 就跳转到 returnUrl, 没有就跳转到用户页
+  router.replace((route.query.returnUrl as string) || '/user')
 }
 </script>
 
