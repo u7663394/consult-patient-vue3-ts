@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { loginByPassword } from '@/services/user'
+import { loginByPassword, sendMobileCode } from '@/services/user'
 import { useUserStore } from '@/stores'
-import { mobileRules, passwordRules } from '@/utils/rules'
-import { showSuccessToast, showToast } from 'vant'
-import { ref } from 'vue'
+import { mobileRules, passwordRules, codeRules } from '@/utils/rules'
+import { showSuccessToast, showToast, type FormInstance } from 'vant'
+import { onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 /**
  * 表单校验 + 提交
  *   1. 判断是否同意协议
  *   2. 登录逻辑
  */
-const mobile = ref('')
-const password = ref('')
+const mobile = ref('13230000007')
+const password = ref('abc12345')
 const agree = ref(false)
 const userStore = useUserStore()
 const router = useRouter()
@@ -28,6 +28,40 @@ const onSubmit = async () => {
   // 2.3. 有 returnUrl 就跳转到 returnUrl, 没有就跳转到用户页
   router.replace((route.query.returnUrl as string) || '/user')
 }
+
+/**
+ * 短信验证码登陆
+ *   1. 发送前验证
+ *   2. 发送验证码
+ *   3. 倒计时
+ */
+const isPassword = ref(true)
+const code = ref('')
+const time = ref(0)
+const form = ref<FormInstance>()
+let timer: number
+const onSend = async () => {
+  // 1. 发送前验证: 倒计时 + 手机号校验
+  if (time.value > 0) return showToast('请稍后再试')
+  await form.value?.validate('mobile')
+  // 2. 发送验证码逻辑
+  await sendMobileCode(mobile.value, 'login')
+  showSuccessToast('验证码发送成功')
+  time.value = 60
+  // 3. 倒计时
+  if (timer) clearInterval(timer)
+  timer = setInterval(() => {
+    time.value--
+    if (time.value <= 0) clearInterval(timer)
+  }, 1000)
+}
+
+/**
+ * 组件卸载时清除定时器
+ */
+onUnmounted(() => {
+  if (timer) clearInterval(timer)
+})
 </script>
 
 <template>
@@ -39,26 +73,35 @@ const onSubmit = async () => {
     ></cp-nav-bar>
     <!-- 头部 -->
     <div class="login-head">
-      <h3>密码登录</h3>
-      <a href="javascript:;">
-        <span>短信验证码登录</span>
+      <h3>{{ isPassword ? '密码登录' : '短信验证码登录' }}</h3>
+      <a href="javascript:;" @click="isPassword = !isPassword">
+        <span>{{ isPassword ? '短信验证码登录' : '密码登录' }}</span>
         <van-icon name="arrow"></van-icon>
       </a>
     </div>
     <!-- 表单 -->
-    <van-form autocomplete="off" @submit="onSubmit">
+    <van-form autocomplete="off" @submit="onSubmit" ref="form">
       <van-field
+        name="mobile"
         v-model="mobile"
         :rules="mobileRules"
         placeholder="请输入手机号"
         type="tel"
       ></van-field>
       <van-field
+        v-if="isPassword"
         v-model="password"
         :rules="passwordRules"
         placeholder="请输入密码"
         type="password"
       ></van-field>
+      <van-field v-else placeholder="短信验证码" v-model="code" :rules="codeRules">
+        <template #button>
+          <span class="btn-send" :class="{ active: time > 0 }" @click="onSend">{{
+            time > 0 ? `${time}s后再次发送` : '发送验证码'
+          }}</span>
+        </template>
+      </van-field>
       <div class="cp-cell">
         <van-checkbox v-model="agree">
           <span>我已同意</span>

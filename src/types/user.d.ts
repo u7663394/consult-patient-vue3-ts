@@ -5,3 +5,6 @@ export type User = {
   mobile: string // 手机号
   avatar: string
 }
+
+// 验证码联合类型
+export type CodeType = 'login' | 'register' | 'changeMobile' | 'forgetPassword' | 'bindMobile'
