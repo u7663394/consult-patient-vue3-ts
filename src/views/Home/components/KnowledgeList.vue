@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import type { KnowledgeType } from '@/types/consult'
 import KnowledgeCard from './KnowledgeCard.vue'
 import { ref } from 'vue'
 
+/**
+ * 下滑加载更多
+ */
 const loading = ref(false)
 const finished = ref(false)
 const list = ref<number[]>([])
@@ -17,6 +21,13 @@ const onLoad = () => {
     loading.value = false
   }, 1000)
 }
+
+/**
+ * 不同列表通过 props 传入
+ */
+defineProps<{
+  type: KnowledgeType
+}>()
 </script>
 
 <template>
