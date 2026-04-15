@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getPatientList } from '@/services/user'
-import type { PatientList } from '@/types/user'
-import { onMounted, ref } from 'vue'
+import type { PatientList, Patient } from '@/types/user'
+import { computed, onMounted, ref } from 'vue'
 
 /**
  * 渲染患者列表
@@ -29,11 +29,43 @@ const gender = ref(1)
 
 /**
  * 弹层显示控制
+ *
+ * 打开时重置表单
  */
 const show = ref(false)
 const showPopup = () => {
+  patient.value = { ...initPatient }
   show.value = true
 }
+
+/**
+ * 表单数据绑定
+ */
+const initPatient: Patient = {
+  name: '',
+  idCard: '',
+  gender: 1,
+  defaultFlag: 0,
+}
+const patient = ref<Patient>({ ...initPatient })
+
+/**
+ * 复选框属性需要转化为 boolean:
+ *   1. 计算属性 get: 转化为 boolean
+ *   2. 计算属性 set: 转化为数字
+ */
+const defaultFlag = computed({
+  get() {
+    return patient.value.defaultFlag === 1 ? true : false
+  },
+  set(bool) {
+    if (bool) {
+      patient.value.defaultFlag = 1
+    } else {
+      patient.value.defaultFlag = 0
+    }
+  },
+})
 </script>
 
 <template>
@@ -75,9 +107,9 @@ const showPopup = () => {
       <van-popup v-model:show="show" position="right">
         <cp-nav-bar title="添加患者" right-text="保存" :back="() => (show = false)"> </cp-nav-bar>
         <van-form autocomplete="off" ref="form">
-          <van-field label="真实姓名" placeholder="请输入真实姓名" />
-          <van-field label="身份证号" placeholder="请输入身份证号" />
-          <van-field label="性别" class="pb4">
+          <van-field v-model="patient.name" label="真实姓名" placeholder="请输入真实姓名" />
+          <van-field v-model="patient.idCard" label="身份证号" placeholder="请输入身份证号" />
+          <van-field v-model="patient.gender" label="性别" class="pb4">
             <!-- 单选按钮组件 -->
             <template #input>
               <!-- 
@@ -90,7 +122,7 @@ const showPopup = () => {
           </van-field>
           <van-field label="默认就诊人">
             <template #input>
-              <van-checkbox :icon-size="18" round />
+              <van-checkbox v-model="defaultFlag" :icon-size="18" round />
             </template>
           </van-field>
         </van-form>

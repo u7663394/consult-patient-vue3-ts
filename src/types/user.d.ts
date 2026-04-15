@@ -28,13 +28,13 @@ export type UserInfo = OmitUser & {
 
 // 患者信息
 export type Patient = {
-  id: string
+  id?: string
   name: string
   idCard: string // 身份证
   defaultFlag: 0 | 1 // 是否默认
   gender: 0 | 1
-  genderValue: string // 性别值
-  age: number
+  genderValue?: string // 性别值
+  age?: number
 }
 
 // 患者信息列表
