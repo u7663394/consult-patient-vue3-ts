@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { getPatientList } from '@/services/user'
+import { addPatient, getPatientList } from '@/services/user'
 import type { PatientList, Patient } from '@/types/user'
 import { idCardRules, nameRules } from '@/utils/rules'
-import { showConfirmDialog, type FormInstance } from 'vant'
+import { showConfirmDialog, showSuccessToast, type FormInstance } from 'vant'
 import { computed, onMounted, ref } from 'vue'
 
 /**
@@ -69,7 +69,10 @@ const defaultFlag = computed({
 })
 
 /**
- * 提交时校验表单
+ * 提交:
+ *   1. 校验表单
+ *   2. 调用接口提交
+ *   3. 关闭弹层 + 刷新列表
  */
 const form = ref<FormInstance>()
 const onSubmit = async () => {
@@ -82,7 +85,12 @@ const onSubmit = async () => {
       message: '填写的性别和身份证号中的不一致\n您确认提交吗?',
     })
   }
-  console.log('通过校验并提交')
+  // 调用接口提交
+  await addPatient(patient.value)
+  // 关闭弹层 + 刷新列表
+  show.value = false
+  loadList()
+  showSuccessToast('添加成功')
 }
 </script>
 
