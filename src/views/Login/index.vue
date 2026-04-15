@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { loginByPassword, sendMobileCode } from '@/services/user'
+import { loginByPassword, sendMobileCode, loginByMobile } from '@/services/user'
 import { useUserStore } from '@/stores'
 import { mobileRules, passwordRules, codeRules } from '@/utils/rules'
 import { showSuccessToast, showToast, type FormInstance } from 'vant'
 import { onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 /**
- * 表单校验 + 提交
+ * 使用密码登录 / 短信验证码登陆
  *   1. 判断是否同意协议
  *   2. 登录逻辑
  */
@@ -20,7 +20,9 @@ const onSubmit = async () => {
   // 1. 判断是否同意协议
   if (!agree.value) return showToast('请同意用户协议和隐私条款')
   // 2. 登录逻辑
-  const res = await loginByPassword(mobile.value, password.value)
+  const res = isPassword.value
+    ? await loginByPassword(mobile.value, password.value)
+    : await loginByMobile(mobile.value, code.value)
   // 2.1. 存储用户信息
   userStore.setUser(res.data)
   // 2.2. 提示登录成功
@@ -30,7 +32,7 @@ const onSubmit = async () => {
 }
 
 /**
- * 短信验证码登陆
+ * 发送短信验证码
  *   1. 发送前验证
  *   2. 发送验证码
  *   3. 倒计时
