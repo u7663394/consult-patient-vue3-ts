@@ -1,33 +1,47 @@
 <script setup lang="ts">
-import type { KnowledgeType } from '@/types/consult'
+import type { KnowledgeList, KnowledgeParams, KnowledgeType } from '@/types/consult'
 import KnowledgeCard from './KnowledgeCard.vue'
 import { ref } from 'vue'
-
-/**
- * 下滑加载更多
- */
-const loading = ref(false)
-const finished = ref(false)
-const list = ref<number[]>([])
-// 模拟加载数据
-const onLoad = () => {
-  setTimeout(() => {
-    const data = [1, 2, 3, 4, 5]
-    list.value.push(...data)
-    // 模拟加载完毕
-    if (list.value.length > 20) {
-      finished.value = true
-    }
-    loading.value = false
-  }, 1000)
-}
+import { getKnowledgePage } from '@/services/consult'
 
 /**
  * 不同列表通过 props 传入
  */
-defineProps<{
+const props = defineProps<{
   type: KnowledgeType
 }>()
+
+/**
+ * 接口查询参数
+ */
+const params = ref<KnowledgeParams>({
+  type: props.type,
+  current: 1,
+  pageSize: 5,
+})
+
+/**
+ * 下滑加载更多:
+ *   1. 调用接口获取数据, 将数据追加到列表中
+ *   2. 判断是否加载完毕
+ *   3. 结束加载状态
+ */
+const loading = ref(false)
+const finished = ref(false)
+const list = ref<KnowledgeList>([])
+const onLoad = async () => {
+  // 1. 调用接口获取数据 + 追加
+  const res = await getKnowledgePage(params.value)
+  list.value.push(...res.data.rows)
+  // 2. 判断是否加载完毕
+  if (params.value.current >= res.data.pageTotal) {
+    finished.value = true
+  } else {
+    params.value.current++
+  }
+  // 3. 结束加载状态
+  loading.value = false
+}
 </script>
 
 <template>
@@ -45,7 +59,7 @@ defineProps<{
       finished-text="没有更多了"
       @load="onLoad"
     >
-      <knowledge-card v-for="(item, index) in list" :key="index" />
+      <knowledge-card v-for="item in list" :key="item.id" :item="item" />
     </van-list>
   </div>
 </template>
