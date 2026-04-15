@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { getUserInfo } from '@/services/user'
+import { useUserStore } from '@/stores'
 import type { UserInfo } from '@/types/user'
+import { showConfirmDialog } from 'vant'
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 /**
  * Mounted 时获取用户信息, 展示在页面上
@@ -11,6 +14,39 @@ onMounted(async () => {
   const res = await getUserInfo()
   user.value = res.data
 })
+
+/**
+ * 渲染 van-cell 组件, 展示快捷工具列表
+ */
+const tools = [
+  { label: '我的问诊', path: '/user/consult' },
+  { label: '我的处方', path: '/' },
+  { label: '家庭档案', path: '/user/patient' },
+  { label: '地址管理', path: '/user/address' },
+  { label: '我的评价', path: '/' },
+  { label: '官方客服', path: '/' },
+  { label: '设置', path: '/' },
+]
+
+/**
+ * 退出登录:
+ *   1. 确认框
+ *   2. 清除用户信息
+ *   3. 跳转到登录页
+ */
+const store = useUserStore()
+const router = useRouter()
+const logout = async () => {
+  // 1. 确认框
+  await showConfirmDialog({
+    title: '温馨提示',
+    message: '您确认要退出优医问诊吗?',
+  })
+  // 2. 清除用户信息
+  store.delUser()
+  // 3. 跳转到登录页
+  router.push('/login')
+}
 </script>
 
 <template>
@@ -74,6 +110,27 @@ onMounted(async () => {
         </van-col>
       </van-row>
     </div>
+    <div class="user-page-group">
+      <h3>快捷工具</h3>
+      <!-- 
+       van-cell:
+         1. title: 标题
+         2. is-link: 显示右侧箭头
+         3. border: 是否显示下边框
+         4. to: 路由跳转地址
+      -->
+      <van-cell
+        v-for="(item, index) in tools"
+        :key="item.label"
+        :title="item.label"
+        :to="item.path"
+        is-link
+        :border="false"
+      >
+        <template #icon><cp-icon :name="`user-tool-0${index + 1}`" /></template>
+      </van-cell>
+    </div>
+    <a @click="logout" class="logout" href="javascript:;">退出登录</a>
   </div>
 </template>
 
