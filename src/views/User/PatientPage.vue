@@ -17,6 +17,15 @@ const loadList = async () => {
 onMounted(() => {
   loadList()
 })
+
+/**
+ * 复选框选项数据
+ */
+const options = [
+  { label: '男', value: 1 },
+  { label: '女', value: 0 },
+]
+const gender = ref(1)
 </script>
 
 <template>
@@ -50,6 +59,12 @@ onMounted(() => {
         <p>添加患者</p>
       </div>
       <div class="patient-tip">最多可添加 6 人</div>
+      <!-- 
+       v-model="gender" 相当于 
+       :modelValue="gender" 加
+       @update:modelValue="gender = $event" 
+      -->
+      <cp-radio-btn :options="options" v-model="gender"></cp-radio-btn>
     </div>
   </div>
 </template>
