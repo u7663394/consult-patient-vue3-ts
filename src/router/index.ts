@@ -1,5 +1,8 @@
 import { useUserStore } from '@/stores'
 import { createRouter, createWebHistory } from 'vue-router'
+// 进度条插件
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 
 /**
  * 路由配置
@@ -53,6 +56,7 @@ const router = createRouter({
  */
 const wihteList = ['/login']
 router.beforeEach((to) => {
+  NProgress.start()
   // 没有 token 且不访问白名单 -> 重定向到登录页
   const userStore = useUserStore()
   if (!userStore.user?.token && !wihteList.includes(to.path)) {
@@ -65,6 +69,15 @@ router.beforeEach((to) => {
  */
 router.afterEach((to) => {
   document.title = `${to.meta.title || ''}-优医问诊`
+  NProgress.done()
+})
+
+/**
+ * NProgress 配置
+ *   showSpinner: 是否显示加载时的旋转图标, 默认为 true
+ */
+NProgress.configure({
+  showSpinner: false,
 })
 
 export default router
