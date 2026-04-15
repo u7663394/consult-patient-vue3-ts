@@ -64,6 +64,11 @@ const onSend = async () => {
 onUnmounted(() => {
   if (timer) clearInterval(timer)
 })
+
+/**
+ * 切换密码可见功能
+ */
+const show = ref(false)
 </script>
 
 <template>
@@ -95,7 +100,13 @@ onUnmounted(() => {
         v-model="password"
         :rules="passwordRules"
         placeholder="请输入密码"
-        type="password"
+        :type="show ? 'text' : 'password'"
+      >
+        <template #button>
+          <cp-icon
+            @click="show = !show"
+            :name="`login-eye-${show ? 'on' : 'off'}`"
+          ></cp-icon> </template
       ></van-field>
       <van-field v-else placeholder="短信验证码" v-model="code" :rules="codeRules">
         <template #button>
