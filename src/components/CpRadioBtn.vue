@@ -10,7 +10,7 @@ defineProps<{
     label: string
     value: string | number
   }[]
-  modelValue: string | number
+  modelValue?: string | number
 }>()
 
 /**

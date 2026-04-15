@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router'
 const props = defineProps<{
   title?: string
   rightText?: string
+  back?: () => void
 }>()
 
 /**
@@ -28,9 +29,13 @@ const onClickRight = () => {
  * 左侧返回功能:
  *   1. 如果有 history 就返回上一页
  *   2. 如果没有 history 就返回首页
+ *   3. 有 back 属性就调用 back 方法
  */
 const router = useRouter()
 const onClickLeft = () => {
+  if (props.back) {
+    return props.back()
+  }
   if (history.state?.back) {
     router.back()
   } else {
