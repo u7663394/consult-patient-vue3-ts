@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { addPatient, getPatientList } from '@/services/user'
+import { addPatient, editPatient, getPatientList } from '@/services/user'
 import type { PatientList, Patient } from '@/types/user'
 import { idCardRules, nameRules } from '@/utils/rules'
 import { showConfirmDialog, showSuccessToast, type FormInstance } from 'vant'
@@ -30,12 +30,17 @@ const options = [
 
 /**
  * 弹层显示控制
- *
- * 打开时重置表单
+ *   1. 无item -> 打开时重置表单
+ *   2. 有item -> 打开时回显 item 数据
  */
 const show = ref(false)
-const showPopup = () => {
-  patient.value = { ...initPatient }
+const showPopup = (item?: Patient) => {
+  if (item) {
+    const { id, gender, name, idCard, defaultFlag } = item
+    patient.value = { id, gender, name, idCard, defaultFlag }
+  } else {
+    patient.value = { ...initPatient }
+  }
   show.value = true
 }
 
@@ -86,11 +91,11 @@ const onSubmit = async () => {
     })
   }
   // 调用接口提交
-  await addPatient(patient.value)
+  patient.value.id ? await editPatient(patient.value) : await addPatient(patient.value)
   // 关闭弹层 + 刷新列表
   show.value = false
   loadList()
-  showSuccessToast('添加成功')
+  showSuccessToast(patient.value.id ? '编辑成功' : '添加成功')
 }
 </script>
 
@@ -105,7 +110,6 @@ const onSubmit = async () => {
           <span>男</span>
           <span>23岁</span>
         </div>
-        <div class="icon"><cp-icon name="user-edit" /></div>
         <div class="tag">默认</div>
       </div>
       <div class="patient-item" v-for="item in list" :key="item.id">
@@ -117,10 +121,10 @@ const onSubmit = async () => {
           <span>{{ item.genderValue }}</span>
           <span>{{ item.age }}岁</span>
         </div>
-        <div class="icon"><cp-icon name="user-edit" /></div>
+        <div @click="showPopup(item)" class="icon"><cp-icon name="user-edit" /></div>
         <div class="tag" v-if="item.defaultFlag === 1">默认</div>
       </div>
-      <div @click="showPopup" class="patient-add" v-if="list.length < 6">
+      <div @click="showPopup(undefined)" class="patient-add" v-if="list.length < 6">
         <cp-icon name="user-add" />
         <p>添加患者</p>
       </div>
@@ -132,7 +136,7 @@ const onSubmit = async () => {
       -->
       <van-popup v-model:show="show" position="right">
         <cp-nav-bar
-          title="添加患者"
+          :title="patient.id ? '编辑患者' : '添加患者'"
           @click-right="onSubmit"
           right-text="保存"
           :back="() => (show = false)"
