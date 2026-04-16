@@ -1,3 +1,5 @@
+import { ConsultType, IllnessTime } from '@/enums/index'
+
 // 文章信息类型
 export type Knowledge = {
   id: string
@@ -68,3 +70,32 @@ export type DoctorPage = {
 
 // 关注类型
 export type FollowType = 'doc' | 'knowledge' | 'topic' | 'disease'
+
+// 图片列表
+export type Image = {
+  id: string
+  url: string
+}
+
+// 问诊记录
+export type Consult = {
+  id: string
+  type: ConsultType
+  illnessType: 0 | 1 // 快速问诊类型，0 普通 1 三甲
+  depId: string // 科室ID
+  illnessDesc: string
+  illnessTime: IllnessTime
+  consultFlag: 0 | 1 // 是否就诊过，0 未就诊过  1 就诊过
+  pictures: Image[]
+  patientId: string
+  couponId: string // 优惠券ID
+}
+
+/**
+ * 将 Consult 类型的所有属性变为可选的类型
+ * 语法: Partial<Type>
+ *
+ * 补充:
+ *   - Required<Type> 将 Type 中的所有属性变为必选的类型
+ */
+export type PartialConsult = Partial<Consult>
