@@ -1,5 +1,30 @@
 <script setup lang="ts">
 import DoctorCard from './DoctorCard.vue'
+import { useWindowSize } from '@vueuse/core'
+
+/**
+ * 利用 vueuse 的 useWindowSize 获取设备宽度
+ */
+const deviceWidth = useWindowSize().width
+
+/**
+ * 利用原生方式获取设备宽度
+ * 
+ * const width = ref(0)
+ * 
+ * const setWidth = () => {
+ *   width.value = window.innerWidth
+ * }
+ * 
+ * onMounted(() => {
+ *   setWidth()
+ *   window.addEventListener('resize', setWidth)
+ * })
+ * 
+ * onUnmounted(() => {
+ *   window.removeEventListener('resize', setWidth)
+ * })
+ */
 </script>
 
 <template>
@@ -11,11 +36,12 @@ import DoctorCard from './DoctorCard.vue'
     <div class="body">
       <!-- 
        swipe 组件:
-         1. width: 每个 swipe-item 的宽度
-         2. show-indicators: 是否显示指示点
-         3. loop: 是否循环滚动
+         1. show-indicators: 是否显示指示点
+         2. loop: 是否循环滚动
+         3. width: 每个子项的宽度; 375px 的设备上子项宽度为 150px
+         4. 公式: 150 / 375 = width / deviceWidth
       -->
-      <van-swipe :width="150" :show-indicators="false" :loop="false">
+      <van-swipe :width="(deviceWidth * 150) / 375" :show-indicators="false" :loop="false">
         <van-swipe-item v-for="item in 5" :key="item">
           <DoctorCard></DoctorCard>
         </van-swipe-item>
