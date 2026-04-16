@@ -99,3 +99,14 @@ export type Consult = {
  *   - Required<Type> 将 Type 中的所有属性变为必选的类型
  */
 export type PartialConsult = Partial<Consult>
+
+// 二级科室
+export type SubDep = {
+  id: string
+  name: string
+}
+
+// 一级科室
+export type TopDep = SubDep & {
+  child: SubDep[]
+}
