@@ -1,5 +1,7 @@
 <script lang="ts" setup>
+import { followOrUnfollow } from '@/services/consult'
 import type { Doctor } from '@/types/consult'
+import { ref } from 'vue'
 
 /**
  * 接受父组件传入的 item 数据
@@ -7,6 +9,29 @@ import type { Doctor } from '@/types/consult'
 defineProps<{
   item: Doctor
 }>()
+
+/**
+ * 关注或取消关注医生
+ *   1. loading 状态控制按钮状态, 防止重复点击
+ *   2. 调用接口
+ *   3. 切换 likeFlag 的值
+ */
+const loading = ref(false)
+const folllow = async (item: Doctor) => {
+  loading.value = true
+  try {
+    // 调用接口
+    await followOrUnfollow(item.id, 'doc')
+    // 切换 likeFlag 的值
+    if (item.likeFlag === 1) {
+      item.likeFlag = 0
+    } else {
+      item.likeFlag = 1
+    }
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <template>
@@ -15,7 +40,7 @@ defineProps<{
     <p class="name">{{ item.name }}</p>
     <p class="van-ellipsis">{{ item.hospitalName }} {{ item.depName }}</p>
     <p>{{ item.positionalTitles }}</p>
-    <van-button round size="small" type="primary">
+    <van-button :loading="loading" @click="folllow(item)" round size="small" type="primary">
       {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
     </van-button>
   </div>
