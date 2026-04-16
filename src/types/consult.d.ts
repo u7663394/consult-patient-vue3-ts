@@ -110,3 +110,14 @@ export type SubDep = {
 export type TopDep = SubDep & {
   child: SubDep[]
 }
+
+/**
+ * 病情描述信息
+ *
+ * 语法:
+ * Pick<Type, Keys> 从 Type 中选择 Keys 构造出新的类型
+ */
+export type ConsultIllness = Pick<
+  PartialConsult,
+  'illnessDesc' | 'illnessTime' | 'consultFlag' | 'pictures'
+>
