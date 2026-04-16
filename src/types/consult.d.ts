@@ -29,9 +29,39 @@ export type KnowledgePage = {
 // 联合类型
 export type KnowledgeType = 'like' | 'recommend' | 'fatReduction' | 'food'
 
-// 文章列表查询参数
-export type KnowledgeParams = {
-  type: KnowledgeType
+// 分页查询参数
+export type PageParams = {
   current: number
   pageSize: number
+}
+
+// 文章列表查询参数
+export type KnowledgeParams = PageParams & {
+  type: KnowledgeType
+}
+
+// 医生卡片对象
+export type Doctor = {
+  id: string
+  name: string
+  avatar: string
+  hospitalName: string
+  gradeName: string // 医院等级
+  depName: string // 科室
+  positionalTitles: string // 职称
+  likeFlag: 0 | 1
+  serviceFee: number
+  consultationNum: number // 接诊人数
+  score: number
+  major: string
+}
+
+// 医生列表
+export type DoctorList = Doctor[]
+
+// 医生分页
+export type DoctorPage = {
+  pageTotal: number
+  total: number
+  rows: DoctorList
 }
