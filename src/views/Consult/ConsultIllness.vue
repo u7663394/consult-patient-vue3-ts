@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { IllnessTime } from '@/enums'
+import { uploadImage } from '@/services/consult'
 import type { ConsultIllness } from '@/types/consult'
+import type { UploaderAfterRead, UploaderFileListItem } from 'vant'
 import { ref } from 'vue'
 
 /**
@@ -32,17 +34,34 @@ const form = ref<ConsultIllness>({
  * 上传图片
  *   1. 绑定文件列表
  *   2. 文件读取完成后的回调函数
+ *     2.1. 通过 uploadImage 接口上传图片
+ *     2.2. 修改 status 和 message 来显示上传状态
+ *     2.3. 上传成功后将图片添加到 form.pictures 中
  *   3. 删除图片的回调函数
  */
-// 文件列表
+// 1. 绑定文件列表
 const fileList = ref([])
-// 文件读取完成
-const onAfterRead = () => {
-  console.log('图片上传了')
+// 2. 文件读取完成回调
+const onAfterRead: UploaderAfterRead = (item) => {
+  if (Array.isArray(item) || !item.file) return
+  item.status = 'uploading'
+  item.message = '上传中...'
+  uploadImage(item.file)
+    .then((res) => {
+      item.status = 'done'
+      item.message = '上传成功'
+      form.value.pictures?.push(res.data)
+    })
+    .catch(() => {
+      item.status = 'failed'
+      item.message = '上传失败'
+    })
 }
-// 删除图片
-const onDeleteImg = () => {
-  console.log('删除了图片')
+// 3. 删除图片回调: filter 删除图片
+const onDeleteImg = (item: UploaderFileListItem) => {
+  form.value.pictures = form.value.pictures?.filter((pic) => {
+    return pic.url !== item.url
+  })
 }
 </script>
 
