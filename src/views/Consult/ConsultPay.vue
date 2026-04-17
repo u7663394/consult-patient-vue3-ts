@@ -136,13 +136,13 @@ onMounted(() => {
  *   3. 调用支付接口
  *   4. 成功则跳转支付链接
  *
- * 测试账号: askgxl8276@sandbox.com / scobys4865@sandbox.com
+ * 测试账号: scobys4865@sandbox.com
  * 登录密码：111111
  * 支付密码：111111
  */
 const onPay = async () => {
-  // 0. 此处由于网路问题, 强行跳转到 room 页面
-  return (window.location.href = 'http://localhost:5173/room?payResult=true')
+  // 0. 测试用: 若由于网路问题, 可强行跳转到 room 页面
+  // return (window.location.href = 'http://localhost:5173/room?orderId=7276410060488704&payResult=true&type=2')
   // 1. 校验
   if (paymentMethod.value === undefined) return showToast('请选择支付方式')
   // 2. 显示 loading toast
