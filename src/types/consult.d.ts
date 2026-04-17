@@ -133,3 +133,10 @@ export type ConsultOrderPreData = {
   payment: number
   actualPayment: number
 }
+
+// 支付参数
+export type PayParams = {
+  paymentMethod: 0 | 1 // 0 微信, 1 支付宝
+  orderId: string
+  payCallback: string
+}

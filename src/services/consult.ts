@@ -8,6 +8,7 @@ import type {
   KnowledgeParams,
   PageParams,
   PartialConsult,
+  PayParams,
   TopDep,
 } from '@/types/consult'
 import { request } from '@/utils/request'
@@ -47,4 +48,9 @@ export const getConsultOrderPre = (params: ConsultOrderPreParams) => {
 // 生成订单
 export const createConsultOrder = (data: PartialConsult) => {
   return request<{ id: string }>('/patient/consult/order', 'POST', data)
+}
+
+// 获取支付地址
+export const getConsultOrderPayUrl = (params: PayParams) => {
+  return request<{ payUrl: string }>('/patient/consult/pay', 'POST', params)
 }

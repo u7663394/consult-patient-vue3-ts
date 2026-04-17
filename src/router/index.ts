@@ -68,6 +68,15 @@ const router = createRouter({
       component: () => import('@/views/Consult/ConsultPay.vue'),
       meta: { title: '问诊支付' },
     },
+    {
+      path: '/room',
+      component: () => import('@/views/Room/index.vue'),
+      meta: { title: '问诊室' },
+      // 订单支付失败则重定向到问诊列表页
+      beforeEnter(to) {
+        if (to.query.payResult === 'false') return '/user/consult'
+      }
+    },
   ],
 })
 

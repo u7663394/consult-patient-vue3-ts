@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { createConsultOrder, getConsultOrderPre } from '@/services/consult'
+import { createConsultOrder, getConsultOrderPayUrl, getConsultOrderPre } from '@/services/consult'
 import { getPatientDetail } from '@/services/user'
 import { useConsultStore } from '@/stores'
 import type { ConsultOrderPreData, PartialConsult } from '@/types/consult'
 import type { Patient } from '@/types/user'
-import { showConfirmDialog, showDialog, showToast } from 'vant'
+import { showConfirmDialog, showDialog, showLoadingToast, showToast } from 'vant'
 import { onMounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 
@@ -128,6 +128,37 @@ onMounted(() => {
     })
   }
 })
+
+/**
+ * 支付功能:
+ *   1. 先校验是否选择支付方式
+ *   2. 显示 loading toast
+ *   3. 调用支付接口
+ *   4. 成功则跳转支付链接
+ *
+ * 测试账号: askgxl8276@sandbox.com / scobys4865@sandbox.com
+ * 登录密码：111111
+ * 支付密码：111111
+ */
+const onPay = async () => {
+  // 0. 此处由于网路问题, 强行跳转到 room 页面
+  return (window.location.href = 'http://localhost:5173/room?payResult=true')
+  // 1. 校验
+  if (paymentMethod.value === undefined) return showToast('请选择支付方式')
+  // 2. 显示 loading toast
+  showLoadingToast({
+    message: '跳转支付', // 提示信息
+    duration: 0, // 显示时间, 0 表示一直显示
+  })
+  // 3. 调用支付接口
+  const res = await getConsultOrderPayUrl({
+    orderId: orderId.value,
+    paymentMethod: paymentMethod.value,
+    payCallback: 'http://localhost:5173/room',
+  })
+  // 4. 成功则跳转支付链接
+  window.location.href = res.data.payUrl
+}
 </script>
 
 <template>
@@ -205,7 +236,7 @@ onMounted(() => {
           </van-cell>
         </van-cell-group>
         <div class="btn">
-          <van-button type="primary" round block>立即支付</van-button>
+          <van-button @click="onPay" type="primary" round block>立即支付</van-button>
         </div>
       </div>
     </van-action-sheet>
