@@ -2,9 +2,14 @@
 import { IllnessTime } from '@/enums'
 import { uploadImage } from '@/services/consult'
 import { useConsultStore } from '@/stores'
-import type { ConsultIllness } from '@/types/consult'
-import { showToast, type UploaderAfterRead, type UploaderFileListItem } from 'vant'
-import { computed, ref } from 'vue'
+import type { ConsultIllness, Image } from '@/types/consult'
+import {
+  showConfirmDialog,
+  showToast,
+  type UploaderAfterRead,
+  type UploaderFileListItem,
+} from 'vant'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 /**
@@ -42,7 +47,7 @@ const form = ref<ConsultIllness>({
  *   3. 删除图片的回调函数
  */
 // 1. 绑定文件列表
-const fileList = ref([])
+const fileList = ref<Image[]>([])
 // 2. 文件读取完成回调
 const onAfterRead: UploaderAfterRead = (item) => {
   if (Array.isArray(item) || !item.file) return
@@ -92,6 +97,24 @@ const next = () => {
   // 2.3. 跳转
   router.push('/user/patient?isChange=1')
 }
+
+/**
+ * 有数据时回显
+ */
+onMounted(() => {
+  if (consultStore.consult.illnessDesc) {
+    showConfirmDialog({
+      title: '温馨提示',
+      message: '是否恢复您之前填写的病情信息呢?',
+      closeOnPopstate: false, // 回退时也显示弹窗
+    }).then(() => {
+      // 回显数据
+      const { illnessDesc, illnessTime, consultFlag, pictures } = consultStore.consult
+      form.value = { illnessDesc, illnessTime, consultFlag, pictures }
+      fileList.value = pictures || []
+    })
+  }
+})
 </script>
 
 <template>
