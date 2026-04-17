@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { IllnessTime } from '@/enums'
 import { uploadImage } from '@/services/consult'
+import { useConsultStore } from '@/stores'
 import type { ConsultIllness } from '@/types/consult'
-import type { UploaderAfterRead, UploaderFileListItem } from 'vant'
-import { ref } from 'vue'
+import { showToast, type UploaderAfterRead, type UploaderFileListItem } from 'vant'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 /**
  * 选项数据
@@ -63,6 +65,33 @@ const onDeleteImg = (item: UploaderFileListItem) => {
     return pic.url !== item.url
   })
 }
+
+/**
+ * 下一步按钮
+ *   1. 按钮 disabled 状态: 没有 desc | time | flag 就禁用
+ *   2. 点击事件: 校验 + 存储 + 跳转
+ */
+const consultStore = useConsultStore()
+const router = useRouter()
+// 1. 按钮状态
+const disabled = computed(() => {
+  return (
+    !form.value.illnessDesc ||
+    form.value.illnessTime === undefined ||
+    form.value.consultFlag === undefined
+  )
+})
+// 2. 点击
+const next = () => {
+  // 2.1. 校验
+  if (!form.value.illnessDesc) return showToast('请输入病情描述')
+  if (form.value.illnessTime === undefined) return showToast('请选择患病时间')
+  if (form.value.consultFlag === undefined) return showToast('请选择是否就诊过')
+  // 2.2. 存储
+  consultStore.setIllness(form.value)
+  // 2.3. 跳转
+  router.push('/user/patient?isChange=1')
+}
 </script>
 
 <template>
@@ -83,6 +112,7 @@ const onDeleteImg = (item: UploaderFileListItem) => {
         type="textarea"
         rows="3"
         placeholder="请详细描述您的病情，病情描述不能为空"
+        v-model="form.illnessDesc"
       ></van-field>
       <div class="item">
         <p>本次患病多久了？</p>
@@ -114,6 +144,7 @@ const onDeleteImg = (item: UploaderFileListItem) => {
         ></van-uploader>
         <p class="tip" v-if="!fileList.length">上传内容仅医生可见,最多 9 张图, 最大 5MB</p>
       </div>
+      <van-button :class="{ disabled }" @click="next" type="primary" block round>下一步</van-button>
     </div>
   </div>
 </template>
@@ -208,6 +239,16 @@ const onDeleteImg = (item: UploaderFileListItem) => {
         color: var(--cp-text3);
       }
     }
+  }
+}
+.van-button {
+  font-size: 16px;
+  margin-bottom: 30px;
+  &.disabled {
+    opacity: 1;
+    background: #fafafa;
+    color: #d9dbde;
+    border: #fafafa;
   }
 }
 </style>
