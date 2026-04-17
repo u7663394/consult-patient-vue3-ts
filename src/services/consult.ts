@@ -1,4 +1,6 @@
 import type {
+  ConsultOrderPreData,
+  ConsultOrderPreParams,
   DoctorPage,
   FollowType,
   Image,
@@ -34,4 +36,9 @@ export const uploadImage = (file: File) => {
   const fd = new FormData()
   fd.append('file', file)
   return request<Image>('/upload', 'POST', fd)
+}
+
+// 获取订单预支付信息
+export const getConsultOrderPre = (params: ConsultOrderPreParams) => {
+  return request<ConsultOrderPreData>('/patient/consult/order/pre', 'GET', params)
 }
