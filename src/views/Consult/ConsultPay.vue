@@ -24,6 +24,8 @@ const loadData = async () => {
   })
   // 赋值
   payInfo.value = res.data
+  // 记录优惠券 ID
+  consultStore.setCoupon(res.data.couponId)
 }
 loadData()
 
@@ -86,6 +88,15 @@ loadPatient()
       button-text="立即支付"
       text-align="left"
     />
+  </div>
+  <div v-else class="consult-pay-page">
+    <cp-nav-bar title="支付" />
+    <!-- 
+     骨架屏: 
+       1. title 标题
+       2. row 显示内容行数
+    -->
+    <van-skeleton title :row="10" style="margin-top: 10px" />
   </div>
 </template>
 
