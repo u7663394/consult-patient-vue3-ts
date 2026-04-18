@@ -75,7 +75,12 @@ const router = createRouter({
       // 订单支付失败则重定向到问诊列表页
       beforeEnter(to) {
         if (to.query.payResult === 'false') return '/user/consult'
-      }
+      },
+    },
+    {
+      path: '/user/consult',
+      component: () => import('@/views/User/ConsultPage.vue'),
+      meta: { title: '问诊记录' },
     },
   ],
 })
