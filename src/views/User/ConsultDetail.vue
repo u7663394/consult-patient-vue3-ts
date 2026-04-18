@@ -158,6 +158,7 @@ const onCopy = async () => {
       v-model:show="show"
       :order-id="item.id"
       :actualPayment="item.actualPayment"
+      pay-callback="/room"
     ></cp-pay-sheet>
   </div>
   <div class="consult-detail-page" v-else>

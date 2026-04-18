@@ -23,3 +23,10 @@ export type AddressItem = {
   addressDetail: string
   isDefault: 0 | 1 // 是否默认地址，0 不是 1 是
 }
+
+// 创建订单参数
+export type CreateMedicalOrderParams = {
+  id: string
+  addressId: string
+  couponId?: string
+}
