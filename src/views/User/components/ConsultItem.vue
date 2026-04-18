@@ -1,11 +1,50 @@
 <script setup lang="ts">
 import { OrderType } from '@/enums'
+import { cancelOrder } from '@/services/consult'
 import type { ConsultOrderItem } from '@/types/consult'
+import { showFailToast, showSuccessToast } from 'vant'
+import { computed, ref } from 'vue'
 
 // 接收 item 属性
-defineProps<{
+const props = defineProps<{
   item: ConsultOrderItem
 }>()
+
+/**
+ * 更多操作
+ */
+const showPopover = ref(false)
+const actions = computed(() => [
+  { text: '查看处方', disabled: !props.item.prescriptionId },
+  { text: '删除订单' },
+])
+const onSelect = () => {
+  // 选项被点击时触发的事件
+  console.log('selected')
+}
+
+/**
+ * 取消订单
+ *   1. 调接口
+ *   2. 成功后修改订单状态
+ */
+const loading = ref(false)
+const cancelConsultOrder = async (item: ConsultOrderItem) => {
+  try {
+    loading.value = true
+    // 1. 调接口
+    await cancelOrder(item.id)
+    // 2. 成功后修改订单状态
+    item.status = OrderType.ConsultCancel
+    item.statusValue = '已取消'
+    showSuccessToast('取消成功')
+  } catch (err) {
+    console.log(err)
+    showFailToast('取消失败')
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <template>
@@ -36,13 +75,31 @@ defineProps<{
       </div>
     </div>
     <div class="foot" v-if="item.status === OrderType.ConsultPay">
-      <van-button class="gray" plain size="small" round>取消问诊</van-button>
+      <van-button
+        class="gray"
+        plain
+        size="small"
+        round
+        :loading="loading"
+        @click="cancelConsultOrder(item)"
+      >
+        取消问诊
+      </van-button>
       <van-button type="primary" plain size="small" round :to="`/user/consult/${item.id}`">
         去支付
       </van-button>
     </div>
     <div class="foot" v-if="item.status === OrderType.ConsultWait">
-      <van-button class="gray" plain size="small" round>取消问诊</van-button>
+      <van-button
+        class="gray"
+        plain
+        size="small"
+        round
+        :loading="loading"
+        @click="cancelConsultOrder(item)"
+      >
+        取消问诊
+      </van-button>
       <van-button type="primary" plain size="small" round :to="`/room?orderId=${item.id}`">
         继续沟通
       </van-button>
@@ -57,6 +114,13 @@ defineProps<{
     </div>
     <div class="foot" v-if="item.status === OrderType.ConsultComplete">
       <div class="more">
+        <!-- 
+         气泡弹出框组件:
+           1. placement: 弹出框位置
+           2. v-model:show: 控制弹出框显示隐藏
+           3. :actions: 弹出框选项列表
+           4. @select: 选项被点击时触发的事件
+        -->
         <van-popover
           placement="top-start"
           v-model:show="showPopover"
