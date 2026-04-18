@@ -1,12 +1,33 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+
 defineProps<{
   disabled: boolean
 }>()
+
+/**
+ * 发送文字消息
+ *   1. 回车发送
+ *   2. 清空输入框
+ */
+const text = ref<string>('')
+// 1. 回车发送
+const emit = defineEmits<{
+  (e: 'send-text', text: string): void
+}>()
+const sendText = () => {
+  if (!text.value.trim()) return
+  emit('send-text', text.value)
+  // 2. 清空输入框
+  text.value = ''
+}
 </script>
 
 <template>
   <div class="room-action">
     <van-field
+      v-model="text"
+      @keyup.enter="sendText"
       type="text"
       class="input"
       :border="false"

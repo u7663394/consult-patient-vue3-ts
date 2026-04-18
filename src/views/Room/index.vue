@@ -78,6 +78,18 @@ onMounted(async () => {
 onUnmounted(() => {
   socket.close()
 })
+
+/**
+ * 发送文字消息
+ */
+const onSendText = (text: string) => {
+  socket.emit('sendChatMsg', {
+    from: userStore.user?.id,
+    to: consult.value?.docInfo?.id,
+    msgType: MsgType.MsgText,
+    msg: { content: text },
+  })
+}
 </script>
 
 <template>
@@ -85,7 +97,10 @@ onUnmounted(() => {
     <cp-nav-bar title="医生问诊室" />
     <room-status :status="consult?.status" :countdown="consult?.countdown" />
     <room-message v-for="msg in list" :key="msg.id" :item="msg"></room-message>
-    <room-action :disabled="consult?.status !== OrderType.ConsultChat"></room-action>
+    <room-action
+      @send-text="onSendText"
+      :disabled="consult?.status !== OrderType.ConsultChat"
+    ></room-action>
   </div>
 </template>
 
