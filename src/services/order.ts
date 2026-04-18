@@ -1,4 +1,4 @@
-import type { OrderPre, AddressItem, CreateMedicalOrderParams } from '@/types/order'
+import type { OrderPre, AddressItem, CreateMedicalOrderParams, OrderDetail } from '@/types/order'
 import { request } from '@/utils/request'
 
 // 获取预支付信息
@@ -14,4 +14,9 @@ export const getAddressList = () => {
 // 创建药品订单
 export const createMedicalOrder = (data: CreateMedicalOrderParams) => {
   return request<{ id: string }>('/patient/medicine/order', 'POST', data)
+}
+
+// 获取订单详情
+export const getMedicalOrderDetail = (id: string) => {
+  return request<OrderDetail>(`/patient/medicine/order/detail/${id}`)
 }

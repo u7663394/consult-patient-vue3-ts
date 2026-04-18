@@ -30,3 +30,36 @@ export type CreateMedicalOrderParams = {
   addressId: string
   couponId?: string
 }
+
+/**
+ * 语法: Omit<T, K>
+ * 表示从类型 T 中剔除 K 中指定的属性，返回一个新的类型。
+ */
+type Address = Omit<AddressItem, 'isDefault'>
+
+// 订单信息
+export type OrderDetail = {
+  id: string
+  orderNo: string
+  type: number
+  createTime: string
+  prescriptionId: string
+  status: OrderType
+  statusValue: string
+  medicines: Medical[]
+  countDown: number
+  addressInfo: Address
+  /** 物流信息 */
+  expressInfo: {
+    content: string
+    time: string
+  }
+  payTime: string
+  paymentMethod?: 0 | 1
+  payment: number
+  pointDeduction: number
+  couponDeduction: number
+  expressFee: number
+  actualPayment: number
+  roomId: string
+}
