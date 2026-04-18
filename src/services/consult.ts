@@ -1,5 +1,7 @@
 import type {
   ConsultOrderItem,
+  ConsultOrderListParams,
+  ConsultOrderPage,
   ConsultOrderPreData,
   ConsultOrderPreParams,
   DoctorPage,
@@ -70,4 +72,9 @@ export const getPrescriptionPic = (id: string) => {
 // 提交评价
 export const evaluateConsultOrder = (data: EvalParams) => {
   return request<{ id: string }>('/patient/order/evaluate', 'POST', data)
+}
+
+// 获取问诊记录列表
+export const getConsultOrderList = (params: ConsultOrderListParams) => {
+  return request<ConsultOrderPage>('/patient/consult/order/list', 'GET', params)
 }

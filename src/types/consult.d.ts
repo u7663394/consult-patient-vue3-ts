@@ -168,3 +168,15 @@ export type EvalParams = {
   content: string
   anonymousFlag: 0 | 1
 }
+
+// 问诊记录参数
+export type ConsultOrderListParams = PageParams & {
+  type: ConsultType
+}
+
+// 问诊记录分页
+export type ConsultOrderPage = {
+  pageTotal: number
+  total: number
+  rows: ConsultOrderItem[]
+}
