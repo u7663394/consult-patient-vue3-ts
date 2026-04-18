@@ -1,4 +1,5 @@
-import { ConsultType, IllnessTime } from '@/enums/index'
+import { ConsultType, IllnessTime, OrderType } from '@/enums/index'
+import type { Patient } from './user'
 
 // 文章信息类型
 export type Knowledge = {
@@ -139,4 +140,22 @@ export type PayParams = {
   paymentMethod: 0 | 1 // 0 微信, 1 支付宝
   orderId: string
   payCallback: string
+}
+
+// 订单单项信息
+export type ConsultOrderItem = Consult & {
+  createTime: string
+  docInfo?: Doctor
+  patientInfo: Patient
+  orderNo: string
+  status: OrderType
+  statusValue: string
+  typeValue: string
+  countdown: number // 倒计时
+  prescriptionId?: string
+  evaluateId: number
+  payment: number
+  couponDeduction: number
+  pointDeduction: number
+  actualPayment: number // 实付款
 }

@@ -32,3 +32,17 @@ export enum PrescriptionStatus {
   Payment = 2,
   Invalid = 3,
 }
+
+// 订单状态
+export enum OrderType {
+  ConsultPay = 1, // 待支付
+  ConsultWait = 2, // 待接诊
+  ConsultChat = 3, // 问诊中
+  ConsultComplete = 4,
+  ConsultCancel = 5,
+  MedicinePay = 10,
+  MedicineSend = 11, // 待发货
+  MedicineTake = 12, // 待收货
+  MedicineComplete = 13,
+  MedicineCancel = 14,
+}

@@ -8,21 +8,32 @@ import { baseURL } from '@/utils/request'
 import { useUserStore } from '@/stores'
 import { useRoute } from 'vue-router'
 import type { Message, TimeMessages } from '@/types/room'
-import { MsgType } from '@/enums'
+import { MsgType, OrderType } from '@/enums'
+import type { ConsultOrderItem } from '@/types/consult'
+import { getConsultOrderDetail } from '@/services/consult'
 
 /**
  * 建立 websocket 通信
+ *   0. 获取订单详情
  *   1. 携带 token 和 orderId
  *   2. 监听连接成功/关闭/错误事件
  *   3. 监听 chatMsgList 事件, 接受默认消息列表
  *     3.1. 处理消息列表以符合接口类型
  *     3.2. 更新 list 用于渲染
+ *   4. 监听 statusChange 事件, 接受订单状态变化消息
  */
 let socket: Socket
 const userStore = useUserStore()
 const route = useRoute()
 const list = ref<Message[]>([])
-onMounted(() => {
+const consult = ref<ConsultOrderItem>()
+const getStatus = async () => {
+  const res = await getConsultOrderDetail(route.query.orderId as string)
+  consult.value = res.data
+}
+onMounted(async () => {
+  // 0. 获取订单详情
+  await getStatus()
   // 1. 建立连接, 携带 token 和 orderId
   socket = io(baseURL, {
     auth: { token: `Bearer ${userStore.user?.token}` },
@@ -58,6 +69,10 @@ onMounted(() => {
     // 3.2. 更新 list 用于渲染
     list.value.unshift(...msgList)
   })
+  // 4. 监听 statusChange 事件
+  socket.on('statusChange', async () => {
+    await getStatus()
+  })
 })
 // 组件卸载时关闭连接
 onUnmounted(() => {
@@ -68,9 +83,9 @@ onUnmounted(() => {
 <template>
   <div class="room-page">
     <cp-nav-bar title="医生问诊室" />
-    <room-status />
+    <room-status :status="consult?.status" :countdown="consult?.countdown" />
     <room-message v-for="msg in list" :key="msg.id" :item="msg"></room-message>
-    <room-action></room-action>
+    <room-action :disabled="consult?.status !== OrderType.ConsultChat"></room-action>
   </div>
 </template>
 
