@@ -1,8 +1,9 @@
 // 利用组合式 API, 实现业务逻辑复用
 import { ref } from 'vue'
-import { followOrUnfollow, getPrescriptionPic } from '@/services/consult'
-import type { FollowType } from '@/types/consult'
-import { showImagePreview } from 'vant'
+import { cancelOrder, followOrUnfollow, getPrescriptionPic } from '@/services/consult'
+import type { ConsultOrderItem, FollowType } from '@/types/consult'
+import { showFailToast, showImagePreview, showSuccessToast } from 'vant'
+import { OrderType } from '@/enums'
 
 /**
  * 关注或取消关注
@@ -40,4 +41,30 @@ export const useShowPrescription = () => {
     showImagePreview([res.data.url])
   }
   return { showPrescription }
+}
+
+/**
+ * 取消订单
+ *   1. 调接口
+ *   2. 成功后修改订单状态
+ */
+export const useCancelOrder = () => {
+  const loading = ref(false)
+  const cancelConsultOrder = async (item: ConsultOrderItem) => {
+    try {
+      loading.value = true
+      // 1. 调接口
+      await cancelOrder(item.id)
+      // 2. 成功后修改订单状态
+      item.status = OrderType.ConsultCancel
+      item.statusValue = '已取消'
+      showSuccessToast('取消成功')
+    } catch (err) {
+      console.log(err)
+      showFailToast('取消失败')
+    } finally {
+      loading.value = false
+    }
+  }
+  return { loading, cancelConsultOrder }
 }

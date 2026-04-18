@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useShowPrescription } from '@/composables'
+import { useCancelOrder, useShowPrescription } from '@/composables'
 import { OrderType } from '@/enums'
-import { cancelOrder, deleteOrder } from '@/services/consult'
+import { deleteOrder } from '@/services/consult'
 import type { ConsultOrderItem } from '@/types/consult'
 import { showFailToast, showSuccessToast } from 'vant'
 import { computed, ref } from 'vue'
@@ -37,23 +37,7 @@ const onSelect = (_: unknown, index: number) => {
  *   1. 调接口
  *   2. 成功后修改订单状态
  */
-const loading = ref(false)
-const cancelConsultOrder = async (item: ConsultOrderItem) => {
-  try {
-    loading.value = true
-    // 1. 调接口
-    await cancelOrder(item.id)
-    // 2. 成功后修改订单状态
-    item.status = OrderType.ConsultCancel
-    item.statusValue = '已取消'
-    showSuccessToast('取消成功')
-  } catch (err) {
-    console.log(err)
-    showFailToast('取消失败')
-  } finally {
-    loading.value = false
-  }
-}
+const { loading, cancelConsultOrder } = useCancelOrder()
 
 /**
  * 删除订单
