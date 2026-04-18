@@ -7,6 +7,7 @@ import { showImagePreview } from 'vant'
 import { useUserStore } from '@/stores'
 import dayjs from 'dayjs'
 import { getPrescriptionPic } from '@/services/consult'
+import EvaluateCard from './EvaluateCard.vue'
 const userStore = useUserStore()
 
 /**
@@ -94,11 +95,11 @@ const showPrescription = async (id?: string) => {
     </div>
   </div>
   <!-- 通知-结束 -->
-  <!-- <div class="msg msg-tip msg-tip-cancel">
+  <div v-if="item.msgType === MsgType.NotifyCancel" class="msg msg-tip msg-tip-cancel">
     <div class="content">
-      <span>订单取消</span>
+      <span>{{ item.msg.content }}</span>
     </div>
-  </div> -->
+  </div>
   <!-- 发送文字 -->
   <div
     v-if="item.msgType === MsgType.MsgText && item.from === userStore.user?.id"
@@ -185,7 +186,13 @@ const showPrescription = async (id?: string) => {
       </div>
     </div>
   </div>
-  <!-- 评价卡片，后期实现 -->
+  <!-- 评价卡片 -->
+  <div
+    class="msg msg-comment"
+    v-if="item.msgType === MsgType.CardEva || item.msgType === MsgType.CardEvaForm"
+  >
+    <evaluate-card :evalState="item.msg.evaluateDoc"></evaluate-card>
+  </div>
 </template>
 
 <style lang="scss" scoped>
