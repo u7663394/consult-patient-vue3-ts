@@ -11,6 +11,8 @@ import type { Message, TimeMessages } from '@/types/room'
 import { MsgType, OrderType } from '@/enums'
 import type { ConsultOrderItem, Image } from '@/types/consult'
 import { getConsultOrderDetail } from '@/services/consult'
+import dayjs from 'dayjs'
+import { showToast } from 'vant'
 
 /**
  * 建立 websocket 通信
@@ -20,6 +22,7 @@ import { getConsultOrderDetail } from '@/services/consult'
  *   3. 监听 chatMsgList 事件, 接受默认消息列表
  *     3.1. 处理消息列表以符合接口类型
  *     3.2. 更新 list 用于渲染
+ *     3.3. 如果是初次进入, 滚动到底部
  *   4. 监听 statusChange 事件, 接受订单状态变化消息
  *   5. 监听 receiveChatMsg 事件, 接受并渲染文字消息
  */
@@ -32,6 +35,7 @@ const getStatus = async () => {
   const res = await getConsultOrderDetail(route.query.orderId as string)
   consult.value = res.data
 }
+const initEnter = ref(true)
 onMounted(async () => {
   // 0. 获取订单详情
   await getStatus()
@@ -56,7 +60,10 @@ onMounted(async () => {
   socket.on('chatMsgList', ({ data }: { data: TimeMessages[] }) => {
     // 3.1. 处理 data 数据得到 Message[] 类型的 msgList
     const msgList: Message[] = []
-    data.forEach((item) => {
+    data.forEach((item, index) => {
+      if (index === 0) {
+        time.value = item.createTime
+      }
       msgList.push({
         msgType: MsgType.Notify,
         msg: {
@@ -69,6 +76,15 @@ onMounted(async () => {
     })
     // 3.2. 更新 list 用于渲染
     list.value.unshift(...msgList)
+    loading.value = false
+    if (!msgList.length) return showToast('没有更多消息了')
+    // 3.3. 如果是初次进入, 滚动到底部
+    if (initEnter.value) {
+      nextTick(() => {
+        window.scrollTo(0, document.body.scrollHeight)
+      })
+      initEnter.value = false
+    }
   })
   // 4. 监听 statusChange 事件
   socket.on('statusChange', async () => {
@@ -110,13 +126,29 @@ const onSendImage = (img: Image) => {
     msg: { picture: img },
   })
 }
+
+/**
+ * 下拉刷新
+ */
+const time = ref(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+const loading = ref(false)
+const onRefresh = async () => {
+  socket.emit('getChatMsgList', 20, time.value, consult.value?.id)
+}
 </script>
 
 <template>
   <div class="room-page">
     <cp-nav-bar title="医生问诊室" />
     <room-status :status="consult?.status" :countdown="consult?.countdown" />
-    <room-message v-for="msg in list" :key="msg.id" :item="msg"></room-message>
+    <!--
+      下拉刷新组件, 包裹消息列表: 
+        1. 绑定 loading 状态
+        2. 监听 refresh 事件, 刷新时回调
+    -->
+    <van-pull-refresh v-model="loading" @refresh="onRefresh">
+      <room-message v-for="msg in list" :key="msg.id" :item="msg"></room-message>
+    </van-pull-refresh>
     <room-action
       @send-image="onSendImage"
       @send-text="onSendText"
