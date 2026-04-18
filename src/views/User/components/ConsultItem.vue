@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { OrderType } from '@/enums'
-import { cancelOrder } from '@/services/consult'
+import { cancelOrder, deleteOrder } from '@/services/consult'
 import type { ConsultOrderItem } from '@/types/consult'
 import { showFailToast, showSuccessToast } from 'vant'
 import { computed, ref } from 'vue'
@@ -12,15 +12,18 @@ const props = defineProps<{
 
 /**
  * 更多操作
+ *   1. index 0: 查看处方
+ *   2. index 1: 删除订单
  */
 const showPopover = ref(false)
 const actions = computed(() => [
   { text: '查看处方', disabled: !props.item.prescriptionId },
   { text: '删除订单' },
 ])
-const onSelect = () => {
-  // 选项被点击时触发的事件
-  console.log('selected')
+const onSelect = (index: number) => {
+  if (index === 1) {
+    deleteConsultOrder(props.item)
+  }
 }
 
 /**
@@ -43,6 +46,31 @@ const cancelConsultOrder = async (item: ConsultOrderItem) => {
     showFailToast('取消失败')
   } finally {
     loading.value = false
+  }
+}
+
+/**
+ * 删除订单
+ *   1. 调接口
+ *   2. 成功后通知父组件删除订单
+ */
+const emit = defineEmits<{
+  (e: 'on-delete', id: string): void
+}>()
+const deleteLoading = ref(false)
+const deleteConsultOrder = async (item: ConsultOrderItem) => {
+  try {
+    deleteLoading.value = true
+    // 1. 调接口
+    await deleteOrder(item.id)
+    showSuccessToast('删除成功')
+    // 2. 成功后通知父组件
+    emit('on-delete', item.id)
+  } catch (err) {
+    console.log(err)
+    showFailToast('删除失败')
+  } finally {
+    deleteLoading.value = false
   }
 }
 </script>
@@ -139,7 +167,16 @@ const cancelConsultOrder = async (item: ConsultOrderItem) => {
       <van-button v-else class="gray" plain size="small" round> 查看评价 </van-button>
     </div>
     <div class="foot" v-if="item.status === OrderType.ConsultCancel">
-      <van-button class="gray" plain size="small" round>删除订单</van-button>
+      <van-button
+        class="gray"
+        plain
+        size="small"
+        round
+        :loading="deleteLoading"
+        @click="deleteConsultOrder(item)"
+      >
+        删除订单
+      </van-button>
       <van-button type="primary" plain size="small" round to="/">咨询其他医生</van-button>
     </div>
   </div>
