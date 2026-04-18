@@ -1,6 +1,6 @@
 // 利用组合式 API, 实现业务逻辑复用
 import { ref } from 'vue'
-import { cancelOrder, followOrUnfollow, getPrescriptionPic } from '@/services/consult'
+import { cancelOrder, deleteOrder, followOrUnfollow, getPrescriptionPic } from '@/services/consult'
 import type { ConsultOrderItem, FollowType } from '@/types/consult'
 import { showFailToast, showImagePreview, showSuccessToast } from 'vant'
 import { OrderType } from '@/enums'
@@ -67,4 +67,32 @@ export const useCancelOrder = () => {
     }
   }
   return { loading, cancelConsultOrder }
+}
+
+/**
+ * 删除订单
+ *   1. 调接口
+ *   2. callback 替代原本的 emit
+ *
+ * 原因:
+ *  此处没有 emit, 只能通过参数传入一个 callback 来通知父组件
+ */
+export const useDeleteOrder = (cb: () => void) => {
+  const deleteLoading = ref(false)
+  const deleteConsultOrder = async (item: ConsultOrderItem) => {
+    try {
+      deleteLoading.value = true
+      // 1. 调接口
+      await deleteOrder(item.id)
+      showSuccessToast('删除成功')
+      // 2. 成功后通知父组件
+      cb && cb()
+    } catch (err) {
+      console.log(err)
+      showFailToast('删除失败')
+    } finally {
+      deleteLoading.value = false
+    }
+  }
+  return { deleteLoading, deleteConsultOrder }
 }
