@@ -159,3 +159,12 @@ export type ConsultOrderItem = Consult & {
   pointDeduction: number
   actualPayment: number // 实付款
 }
+
+// 评价参数
+export type EvalParams = {
+  docId: string
+  orderId: string
+  score: number
+  content: string
+  anonymousFlag: 0 | 1
+}

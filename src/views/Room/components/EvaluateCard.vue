@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { evaluateConsultOrder } from '@/services/consult'
+import type { ConsultOrderItem } from '@/types/consult'
 import type { EvaluateDoc } from '@/types/room'
 import { showToast } from 'vant'
-import { computed, ref } from 'vue'
+import { computed, inject, ref, type Ref } from 'vue'
 
 defineProps<{
   evalState?: EvaluateDoc
@@ -21,10 +23,25 @@ const disabled = computed(() => {
  * 提交评价
  *   1. 校验
  *   2. 调用接口提交
+ *   3. 修改卡片状态
  */
-const onSubmit = () => {
+const consult = inject<Ref<ConsultOrderItem>>('consult')
+const completeEva = inject<(score: number) => void>('completeEva')
+const onSubmit = async () => {
+  // 1. 校验
   if (!score.value) return showToast('请打分')
   if (!content.value.trim()) return showToast('请填写评价内容')
+  // 2. 调用接口提交
+  await evaluateConsultOrder({
+    docId: consult?.value.docInfo?.id!,
+    orderId: consult?.value.id!,
+    score: score.value,
+    content: content.value.trim(),
+    anonymousFlag: isAnonymous.value ? 1 : 0,
+  })
+  // 3. 修改卡片状态
+  completeEva!(score.value)
+  showToast('评价提交成功')
 }
 </script>
 
@@ -34,7 +51,7 @@ const onSubmit = () => {
     <p class="title">医生服务评价</p>
     <p class="desc">我们会更加努力提升服务质量</p>
     <van-rate
-      :modelValue="3"
+      :modelValue="evalState.score"
       size="7vw"
       gutter="3vw"
       color="#FADB14"

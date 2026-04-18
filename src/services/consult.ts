@@ -3,6 +3,7 @@ import type {
   ConsultOrderPreData,
   ConsultOrderPreParams,
   DoctorPage,
+  EvalParams,
   FollowType,
   Image,
   KnowledgePage,
@@ -64,4 +65,9 @@ export const getConsultOrderDetail = (orderId: string) => {
 // 查看处方
 export const getPrescriptionPic = (id: string) => {
   return request<{ url: string }>(`/patient/consult/prescription/${id}`)
+}
+
+// 提交评价
+export const evaluateConsultOrder = (data: EvalParams) => {
+  return request<{ id: string }>('/patient/order/evaluate', 'POST', data)
 }

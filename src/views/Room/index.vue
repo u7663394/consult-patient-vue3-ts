@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, provide, ref } from 'vue'
 import RoomAction from './components/RoomAction.vue'
 import RoomMessage from './components/RoomMessage.vue'
 import RoomStatus from './components/RoomStatus.vue'
@@ -137,6 +137,24 @@ const loading = ref(false)
 const onRefresh = async () => {
   socket.emit('getChatMsgList', 20, time.value, consult.value?.id)
 }
+
+/**
+ * provide consult 信息给子组件, 提交评价时使用
+ */
+provide('consult', consult.value)
+
+/**
+ * 完成评价后修改卡片状态
+ */
+const completeEva = (score: number) => {
+  const item = list.value.find((ele) => ele.msgType === MsgType.CardEvaForm)
+  if (item) {
+    // 设置分数 + 设置状态
+    item.msg.evaluateDoc = { score }
+    item.msgType = MsgType.CardEva
+  }
+}
+provide('completeEva', completeEva)
 </script>
 
 <template>

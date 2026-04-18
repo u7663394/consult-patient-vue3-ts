@@ -8,7 +8,7 @@ import type { AxiosRequestConfig } from 'axios'
 const baseURL = 'https://consult-api.itheima.net/'
 const instance = axios.create({
   baseURL: baseURL,
-  timeout: 10000,
+  timeout: 15000,
 })
 
 instance.interceptors.request.use(
