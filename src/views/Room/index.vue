@@ -80,6 +80,7 @@ onMounted(async () => {
     if (!msgList.length) return showToast('没有更多消息了')
     // 3.3. 如果是初次进入, 滚动到底部
     if (initEnter.value) {
+      socket.emit('updateMsgStatus', msgList[msgList.length - 1]!.id)
       nextTick(() => {
         window.scrollTo(0, document.body.scrollHeight)
       })
@@ -92,6 +93,7 @@ onMounted(async () => {
   })
   // 5. 监听 receiveChatMsg 事件
   socket.on('receiveChatMsg', async (msg: Message) => {
+    socket.emit('updateMsgStatus', msg.id)
     list.value.push(msg)
     // 滚动到底部
     await nextTick()
