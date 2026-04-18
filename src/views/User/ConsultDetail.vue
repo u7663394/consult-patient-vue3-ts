@@ -7,6 +7,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { getConsultFlagText, getIllnessTimeText } from '@/utils/filter'
 import ConsultMore from './components/ConsultMore.vue'
 import { useCancelOrder, useDeleteOrder, useShowPrescription } from '@/composables'
+import { useClipboard } from '@vueuse/core'
+import { showToast } from 'vant'
 
 /**
  * 渲染页面
@@ -37,6 +39,19 @@ const router = useRouter()
 const { deleteLoading, deleteConsultOrder } = useDeleteOrder(() => {
   router.push('/user/consult')
 })
+
+/**
+ * 复制订单编号
+ *   1. copy: 需要拷贝的内容
+ *   2. copied: 是否拷贝成功, 默认 1.5s 恢复状态
+ *   3. isSupported: 浏览器是否支持, 需要授权读取和写入粘贴板权限
+ */
+const { copy, isSupported } = useClipboard()
+const onCopy = async () => {
+  if (!isSupported.value) return showToast('抱歉, 您的浏览器不支持')
+  await copy(item.value?.orderNo || '')
+  showToast('已复制')
+}
 </script>
 
 <template>
@@ -80,7 +95,7 @@ const { deleteLoading, deleteConsultOrder } = useDeleteOrder(() => {
       <van-cell-group :border="false">
         <van-cell title="订单编号">
           <template #value>
-            <span class="copy">复制</span>
+            <span class="copy" @click="onCopy">复制</span>
             {{ item.orderNo }}
           </template>
         </van-cell>
