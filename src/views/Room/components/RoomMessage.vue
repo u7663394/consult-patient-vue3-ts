@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { IllnessTime, MsgType } from '@/enums'
+import { MsgType } from '@/enums'
 import type { Message } from '@/types/room'
-import { timeOptions, flagOptions } from '@/services/constant'
 import type { Image } from '@/types/consult'
 import { showImagePreview } from 'vant'
 import { useUserStore } from '@/stores'
 import dayjs from 'dayjs'
 import EvaluateCard from './EvaluateCard.vue'
 import { useShowPrescription } from '@/composables'
+import { getConsultFlagText, getIllnessTimeText } from '@/utils/filter'
 const userStore = useUserStore()
 
 /**
@@ -16,19 +16,6 @@ const userStore = useUserStore()
 defineProps<{
   item: Message
 }>()
-
-/**
- * 获取患病时间与是否就诊文本
- */
-const getIllnessTimeText = (time: IllnessTime) => {
-  const text = timeOptions.find((ele) => ele.value === time)?.label
-  return text
-}
-
-const getConsultFlagText = (flag: number) => {
-  const text = flagOptions.find((ele) => ele.value === flag)?.label
-  return text
-}
 
 /**
  * 预览图片
