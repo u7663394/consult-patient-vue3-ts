@@ -6,8 +6,8 @@ import type { Image } from '@/types/consult'
 import { showImagePreview } from 'vant'
 import { useUserStore } from '@/stores'
 import dayjs from 'dayjs'
-import { getPrescriptionPic } from '@/services/consult'
 import EvaluateCard from './EvaluateCard.vue'
+import { useShowPrescription } from '@/composables'
 const userStore = useUserStore()
 
 /**
@@ -47,11 +47,7 @@ const formatTime = (time: string) => {
 /**
  * 查看处方详情
  */
-const showPrescription = async (id?: string) => {
-  if (!id) return
-  const res = await getPrescriptionPic(id)
-  showImagePreview([res.data.url])
-}
+const { showPrescription } = useShowPrescription()
 </script>
 
 <template>

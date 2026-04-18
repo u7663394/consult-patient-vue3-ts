@@ -1,7 +1,8 @@
 // 利用组合式 API, 实现业务逻辑复用
 import { ref } from 'vue'
-import { followOrUnfollow } from '@/services/consult'
+import { followOrUnfollow, getPrescriptionPic } from '@/services/consult'
 import type { FollowType } from '@/types/consult'
+import { showImagePreview } from 'vant'
 
 /**
  * 关注或取消关注
@@ -27,4 +28,16 @@ export const useFollow = (type: FollowType = 'doc') => {
     }
   }
   return { loading, follow }
+}
+
+/**
+ * 查看处方详情
+ */
+export const useShowPrescription = () => {
+  const showPrescription = async (id?: string) => {
+    if (!id) return
+    const res = await getPrescriptionPic(id)
+    showImagePreview([res.data.url])
+  }
+  return { showPrescription }
 }

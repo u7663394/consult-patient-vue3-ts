@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useShowPrescription } from '@/composables'
 import { OrderType } from '@/enums'
 import { cancelOrder, deleteOrder } from '@/services/consult'
 import type { ConsultOrderItem } from '@/types/consult'
@@ -20,9 +21,14 @@ const actions = computed(() => [
   { text: '查看处方', disabled: !props.item.prescriptionId },
   { text: '删除订单' },
 ])
-const onSelect = (index: number) => {
+// _ 占位: 此处有参但是不需要用到, 可以用 _ 代替 (类似 Python 中的 _ )
+const onSelect = (_: unknown, index: number) => {
   if (index === 1) {
     deleteConsultOrder(props.item)
+  }
+  if (index === 0 && props.item.prescriptionId) {
+    showPrescription(props.item.prescriptionId)
+    console.log('aaa')
   }
 }
 
@@ -73,6 +79,11 @@ const deleteConsultOrder = async (item: ConsultOrderItem) => {
     deleteLoading.value = false
   }
 }
+
+/**
+ * 查看处方详情
+ */
+const { showPrescription } = useShowPrescription()
 </script>
 
 <template>
@@ -133,7 +144,14 @@ const deleteConsultOrder = async (item: ConsultOrderItem) => {
       </van-button>
     </div>
     <div class="foot" v-if="item.status === OrderType.ConsultChat">
-      <van-button v-if="item.prescriptionId" class="gray" plain size="small" round>
+      <van-button
+        v-if="item.prescriptionId"
+        class="gray"
+        plain
+        size="small"
+        round
+        @click="showPrescription(item.prescriptionId)"
+      >
         查看处方
       </van-button>
       <van-button type="primary" plain size="small" round :to="`/room?orderId=${item.id}`">
