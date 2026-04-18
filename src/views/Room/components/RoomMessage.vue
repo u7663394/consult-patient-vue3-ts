@@ -4,6 +4,9 @@ import type { Message } from '@/types/room'
 import { timeOptions, flagOptions } from '@/services/constant'
 import type { Image } from '@/types/consult'
 import { showImagePreview } from 'vant'
+import { useUserStore } from '@/stores'
+import dayjs from 'dayjs'
+const userStore = useUserStore()
 
 /**
  * 通过 props 接收消息数据
@@ -30,6 +33,13 @@ const getConsultFlagText = (flag: number) => {
  */
 const previewImg = (images: Image[]) => {
   showImagePreview(images.map((ele) => ele.url))
+}
+
+/**
+ * 格式化时间
+ */
+const formatTime = (time: string) => {
+  return dayjs(time).format('YYYY-MM-DD HH:mm')
 }
 </script>
 
@@ -80,13 +90,21 @@ const previewImg = (images: Image[]) => {
     </div>
   </div> -->
   <!-- 发送文字 -->
-  <!-- <div class="msg msg-to">
+  <div
+    v-if="item.msgType === MsgType.MsgText && item.from === userStore.user?.id"
+    class="msg msg-to"
+  >
     <div class="content">
-      <div class="time">20:12</div>
-      <div class="pao">大夫你好?</div>
+      <div class="time">{{ formatTime(item.createTime) }}</div>
+      <div class="pao">{{ item.msg.content }}</div>
     </div>
-    <van-image src="https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/popular_3.jpg" />
-  </div> -->
+    <van-image
+      :src="
+        item.fromAvatar ||
+        'https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/popular_3.jpg'
+      "
+    />
+  </div>
   <!-- 发送图片 -->
   <!-- <div class="msg msg-to">
     <div class="content">
@@ -99,13 +117,21 @@ const previewImg = (images: Image[]) => {
     <van-image src="https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/popular_3.jpg" />
   </div> -->
   <!-- 接收文字 -->
-  <!-- <div class="msg msg-from">
-    <van-image src="https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/popular_3.jpg" />
+  <div
+    v-if="item.msgType === MsgType.MsgText && item.from !== userStore.user?.id"
+    class="msg msg-from"
+  >
+    <van-image
+      :src="
+        item.toAvatar ||
+        'https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/popular_3.jpg'
+      "
+    />
     <div class="content">
-      <div class="time">20:12</div>
-      <div class="pao">哪里不舒服</div>
+      <div class="time">{{ formatTime(item.createTime) }}</div>
+      <div class="pao">{{ item.msg.content }}</div>
     </div>
-  </div> -->
+  </div>
   <!-- 接收图片 -->
   <!-- <div class="msg msg-from">
     <van-image src="https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/popular_3.jpg" />

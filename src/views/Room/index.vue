@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import RoomAction from './components/RoomAction.vue'
 import RoomMessage from './components/RoomMessage.vue'
 import RoomStatus from './components/RoomStatus.vue'
@@ -21,6 +21,7 @@ import { getConsultOrderDetail } from '@/services/consult'
  *     3.1. 处理消息列表以符合接口类型
  *     3.2. 更新 list 用于渲染
  *   4. 监听 statusChange 事件, 接受订单状态变化消息
+ *   5. 监听 receiveChatMsg 事件, 接受并渲染文字消息
  */
 let socket: Socket
 const userStore = useUserStore()
@@ -72,6 +73,13 @@ onMounted(async () => {
   // 4. 监听 statusChange 事件
   socket.on('statusChange', async () => {
     await getStatus()
+  })
+  // 5. 监听 receiveChatMsg 事件
+  socket.on('receiveChatMsg', async (msg: Message) => {
+    list.value.push(msg)
+    // 滚动到底部
+    await nextTick()
+    window.scrollTo(0, document.body.scrollHeight)
   })
 })
 // 组件卸载时关闭连接
