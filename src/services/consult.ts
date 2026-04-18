@@ -60,3 +60,8 @@ export const getConsultOrderPayUrl = (params: PayParams) => {
 export const getConsultOrderDetail = (orderId: string) => {
   return request<ConsultOrderItem>('/patient/consult/order/detail', 'GET', { orderId })
 }
+
+// 查看处方
+export const getPrescriptionPic = (id: string) => {
+  return request<{ url: string }>(`/patient/consult/prescription/${id}`)
+}
