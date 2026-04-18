@@ -9,7 +9,7 @@ import { useUserStore } from '@/stores'
 import { useRoute } from 'vue-router'
 import type { Message, TimeMessages } from '@/types/room'
 import { MsgType, OrderType } from '@/enums'
-import type { ConsultOrderItem } from '@/types/consult'
+import type { ConsultOrderItem, Image } from '@/types/consult'
 import { getConsultOrderDetail } from '@/services/consult'
 
 /**
@@ -98,6 +98,18 @@ const onSendText = (text: string) => {
     msg: { content: text },
   })
 }
+
+/**
+ * 发送图片消息
+ */
+const onSendImage = (img: Image) => {
+  socket.emit('sendChatMsg', {
+    from: userStore.user?.id,
+    to: consult.value?.docInfo?.id,
+    msgType: MsgType.MsgImage,
+    msg: { picture: img },
+  })
+}
 </script>
 
 <template>
@@ -106,6 +118,7 @@ const onSendText = (text: string) => {
     <room-status :status="consult?.status" :countdown="consult?.countdown" />
     <room-message v-for="msg in list" :key="msg.id" :item="msg"></room-message>
     <room-action
+      @send-image="onSendImage"
       @send-text="onSendText"
       :disabled="consult?.status !== OrderType.ConsultChat"
     ></room-action>
