@@ -46,3 +46,12 @@ export enum OrderType {
   MedicineComplete = 13,
   MedicineCancel = 14,
 }
+
+// 快递状态
+export enum ExpressStatus {
+  Delivered = 1,
+  Received = 2,
+  Transit = 3,
+  Delivery = 4,
+  Signed = 5,
+}
