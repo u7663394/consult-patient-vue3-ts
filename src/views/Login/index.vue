@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { loginByPassword, sendMobileCode, loginByMobile } from '@/services/user'
+import { useSendMobileCode } from '@/composables'
+import { loginByPassword, loginByMobile } from '@/services/user'
 import { useUserStore } from '@/stores'
 import { mobileRules, passwordRules, codeRules } from '@/utils/rules'
-import { showSuccessToast, showToast, type FormInstance } from 'vant'
-import { onUnmounted, ref } from 'vue'
+import { showSuccessToast, showToast } from 'vant'
+import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 /**
  * 使用密码登录 / 短信验证码登陆
@@ -12,6 +13,8 @@ import { useRoute, useRouter } from 'vue-router'
  */
 const mobile = ref('13230000007')
 const password = ref('abc12345')
+const code = ref('')
+const isPassword = ref(true)
 const agree = ref(false)
 const userStore = useUserStore()
 const router = useRouter()
@@ -37,33 +40,8 @@ const onSubmit = async () => {
  *   2. 发送验证码
  *   3. 倒计时
  */
-const isPassword = ref(true)
-const code = ref('')
-const time = ref(0)
-const form = ref<FormInstance>()
-let timer: number
-const onSend = async () => {
-  // 1. 发送前验证: 倒计时 + 手机号校验
-  if (time.value > 0) return showToast('请稍后再试')
-  await form.value?.validate('mobile')
-  // 2. 发送验证码逻辑
-  await sendMobileCode(mobile.value, 'login')
-  showSuccessToast('验证码发送成功')
-  time.value = 60
-  // 3. 倒计时
-  if (timer) clearInterval(timer)
-  timer = setInterval(() => {
-    time.value--
-    if (time.value <= 0) clearInterval(timer)
-  }, 1000)
-}
-
-/**
- * 组件卸载时清除定时器
- */
-onUnmounted(() => {
-  if (timer) clearInterval(timer)
-})
+ 
+const { form, time, onSend } = useSendMobileCode(mobile, 'login')
 
 /**
  * 切换密码可见功能

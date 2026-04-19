@@ -1,11 +1,19 @@
 // 利用组合式 API, 实现业务逻辑复用
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, type Ref } from 'vue'
 import { cancelOrder, deleteOrder, followOrUnfollow, getPrescriptionPic } from '@/services/consult'
 import type { ConsultOrderItem, FollowType } from '@/types/consult'
-import { showFailToast, showImagePreview, showSuccessToast } from 'vant'
+import {
+  showFailToast,
+  showImagePreview,
+  showSuccessToast,
+  showToast,
+  type FormInstance,
+} from 'vant'
 import { OrderType } from '@/enums'
 import type { OrderDetail } from '@/types/order'
 import { getMedicalOrderDetail } from '@/services/order'
+import type { CodeType } from '@/types/user'
+import { sendMobileCode } from '@/services/user'
 
 /**
  * 关注或取消关注
@@ -115,4 +123,35 @@ export const useOrderDetail = (id: string) => {
     }
   })
   return { order, loading }
+}
+
+/**
+ * 发送短信验证码
+ *   1. 发送前验证
+ *   2. 发送验证码
+ *   3. 倒计时
+ */
+export const useSendMobileCode = (mobile: Ref<string>, type: CodeType = 'login') => {
+  const time = ref(0)
+  const form = ref<FormInstance>()
+  let timer: number
+  const onSend = async () => {
+    // 1. 发送前验证: 倒计时 + 手机号校验
+    if (time.value > 0) return showToast('请稍后再试')
+    await form.value?.validate('mobile')
+    // 2. 发送验证码逻辑
+    await sendMobileCode(mobile.value, type)
+    showSuccessToast('验证码发送成功')
+    time.value = 60
+    // 3. 倒计时
+    if (timer) clearInterval(timer)
+    timer = setInterval(() => {
+      time.value--
+      if (time.value <= 0) clearInterval(timer)
+    }, 1000)
+  }
+  onUnmounted(() => {
+    if (timer) clearInterval(timer)
+  })
+  return { form, time, onSend }
 }
