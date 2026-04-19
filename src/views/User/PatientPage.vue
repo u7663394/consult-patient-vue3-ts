@@ -127,6 +127,7 @@ const onRemove = async () => {
  */
 const route = useRoute()
 const isChange = computed(() => route.query.isChange === '1')
+const fromMedicineConsultFlag = computed(() => route.query.from === 'medicineConsult')
 
 /**
  * 选中效果
@@ -151,7 +152,11 @@ const next = async () => {
   // 储存 id
   consultStore.setPatient(patientId.value)
   // 跳转页面
-  router.push('/consult/pay')
+  if (fromMedicineConsultFlag.value) {
+    router.push('/consult/choose')
+  } else {
+    router.push('/consult/pay')
+  }
 }
 </script>
 

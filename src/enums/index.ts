@@ -5,6 +5,35 @@ export enum ConsultType {
   Medication = 3, // 开药问诊
 }
 
+// 肝功能
+export enum LiverFunction {
+  Normal,
+  Abnormal,
+  Unclear,
+}
+
+// 肾功能
+export enum RenalFunction {
+  Normal,
+  Abnormal,
+  Unclear,
+}
+
+// 过敏史
+export enum AllergicHistory {
+  Normal,
+  Abnormal,
+  Unclear,
+}
+
+// 生育状态及计划
+export enum FertilityStatus {
+  No,
+  TryingToConceive,
+  AlreadyPregnant,
+  Breastfeeding,
+}
+
 // 问诊时间
 export enum IllnessTime {
   Week = 1,

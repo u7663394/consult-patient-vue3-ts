@@ -1,14 +1,8 @@
 <script setup lang="ts">
 import { IllnessTime } from '@/enums'
-import { uploadImage } from '@/services/consult'
 import { useConsultStore } from '@/stores'
 import type { ConsultIllness, Image } from '@/types/consult'
-import {
-  showConfirmDialog,
-  showToast,
-  type UploaderAfterRead,
-  type UploaderFileListItem,
-} from 'vant'
+import { showConfirmDialog, showToast, type UploaderFileListItem } from 'vant'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -37,34 +31,10 @@ const form = ref<ConsultIllness>({
   pictures: [],
 })
 
-/**
- * 上传图片
- *   1. 绑定文件列表
- *   2. 文件读取完成后的回调函数
- *     2.1. 通过 uploadImage 接口上传图片
- *     2.2. 修改 status 和 message 来显示上传状态
- *     2.3. 上传成功后将图片添加到 form.pictures 中
- *   3. 删除图片的回调函数
- */
-// 1. 绑定文件列表
-const fileList = ref<Image[]>([])
-// 2. 文件读取完成回调
-const onAfterRead: UploaderAfterRead = (item) => {
-  if (Array.isArray(item) || !item.file) return
-  item.status = 'uploading'
-  item.message = '上传中...'
-  uploadImage(item.file)
-    .then((res) => {
-      item.status = 'done'
-      item.message = '上传成功'
-      form.value.pictures?.push(res.data)
-    })
-    .catch(() => {
-      item.status = 'failed'
-      item.message = '上传失败'
-    })
+const cpUploadRef = ref<{ setFileList: (val: Image[]) => void }>()
+const onUploadSuccess = (image: Image) => {
+  form.value.pictures?.push(image)
 }
-// 3. 删除图片回调: filter 删除图片
 const onDeleteImg = (item: UploaderFileListItem) => {
   form.value.pictures = form.value.pictures?.filter((pic) => {
     return pic.url !== item.url
@@ -111,7 +81,7 @@ onMounted(() => {
       // 回显数据
       const { illnessDesc, illnessTime, consultFlag, pictures } = consultStore.consult
       form.value = { illnessDesc, illnessTime, consultFlag, pictures }
-      fileList.value = pictures || []
+      cpUploadRef.value?.setFileList(pictures || [])
     })
   }
 })
@@ -145,28 +115,11 @@ onMounted(() => {
         <p>此次病情是否去医院就诊过？</p>
         <cp-radio-btn :options="flagOptions" v-model="form.consultFlag"></cp-radio-btn>
       </div>
-      <div class="illness-img">
-        <!-- 
-         上传组件: 
-          1. upload-icon: 上传图标
-          2. upload-text: 上传文本
-          3. max-count: 最大上传数量
-          4. max-size: 最大上传大小，单位为字节
-          5. v-model: 绑定上传的文件列表, 会自动收集
-          6. after-read: 文件读取完成后的回调函数
-          7. @delete: 删除图片的回调函数
-        -->
-        <van-uploader
-          upload-icon="photo-o"
-          upload-text="上传图片"
-          max-count="9"
-          :max-size="5 * 1024 * 1024"
-          v-model="fileList"
-          :after-read="onAfterRead"
-          @delete="onDeleteImg"
-        ></van-uploader>
-        <p class="tip" v-if="!fileList.length">上传内容仅医生可见,最多 9 张图, 最大 5MB</p>
-      </div>
+      <cp-upload
+        ref="cpUploadRef"
+        @upload-success="onUploadSuccess"
+        @delete-success="onDeleteImg"
+      />
       <van-button :class="{ disabled }" @click="next" type="primary" block round>下一步</van-button>
     </div>
   </div>
@@ -224,43 +177,6 @@ onMounted(() => {
     > p {
       color: var(--cp-text3);
       padding: 15px 0;
-    }
-  }
-}
-.illness-img {
-  padding-top: 16px;
-  margin-bottom: 40px;
-  display: flex;
-  align-items: center;
-  .tip {
-    font-size: 12px;
-    color: var(--cp-tip);
-  }
-  ::v-deep() {
-    .van-uploader {
-      &__preview {
-        &-delete {
-          left: -6px;
-          top: -6px;
-          border-radius: 50%;
-          background-color: var(--cp-primary);
-          width: 20px;
-          height: 20px;
-          &-icon {
-            transform: scale(0.9) translate(-22%, 22%);
-          }
-        }
-        &-image {
-          border-radius: 8px;
-          overflow: hidden;
-        }
-      }
-      &__upload {
-        border-radius: 8px;
-      }
-      &__upload-icon {
-        color: var(--cp-text3);
-      }
     }
   }
 }

@@ -1,7 +1,8 @@
 import type { ConsultType } from '@/enums'
-import type { ConsultIllness, PartialConsult } from '@/types/consult'
+import type { ConsultIllness, MedicineIllness, PartialConsult } from '@/types/consult'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import type { Medical } from '@/types/room'
 
 export const useConsultStore = defineStore(
   'cp-consult',
@@ -27,9 +28,22 @@ export const useConsultStore = defineStore(
       consult.value.consultFlag = illness.consultFlag
       consult.value.pictures = illness.pictures
     }
+    // 5.1 记录开药门诊病情
+    const setMedicineIllness = (illness: MedicineIllness) => {
+      consult.value.illnessDesc = illness.illnessDesc
+      consult.value.liverFunction = illness.liverFunction
+      consult.value.renalFunction = illness.renalFunction
+      consult.value.allergicHistory = illness.allergicHistory
+      consult.value.fertilityStatus = illness.fertilityStatus
+      consult.value.pictures = illness.pictures
+    }
     // 6. 记录患者
     const setPatient = (patientId: string) => {
       consult.value.patientId = patientId
+    }
+    // 6.1 记录药品
+    const setMedicines = (medicines: Medical[]) => {
+      consult.value.medicines = medicines
     }
     // 7. 记录优惠券
     const setCoupon = (couponId: string) => {
@@ -40,7 +54,18 @@ export const useConsultStore = defineStore(
       consult.value = {}
     }
     // 最后 return
-    return { consult, setType, setIllnessLevel, setDep, setIllness, setPatient, setCoupon, clear }
+    return {
+      consult,
+      setType,
+      setIllnessLevel,
+      setDep,
+      setIllness,
+      setMedicineIllness,
+      setPatient,
+      setMedicines,
+      setCoupon,
+      clear,
+    }
   },
   {
     persist: true,

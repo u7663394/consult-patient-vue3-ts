@@ -10,6 +10,9 @@ import type {
   Image,
   KnowledgePage,
   KnowledgeParams,
+  MedicineDetail,
+  MedicinePage,
+  MedicineParams,
   PageParams,
   PartialConsult,
   PayParams,
@@ -25,6 +28,16 @@ export const getKnowledgePage = (params: KnowledgeParams) => {
 // 获取医生列表
 export const getDoctorPage = (params: PageParams) => {
   return request<DoctorPage>('/home/page/doc', 'GET', params)
+}
+
+// 获取药品分页列表
+export const getMedicinePage = (params: MedicineParams) => {
+  return request<MedicinePage>('/patient/medicine', 'GET', params)
+}
+
+// 获取药品详情
+export const getMedicineDetail = (id: string) => {
+  return request<MedicineDetail>(`/patient/medicine/${id}`)
 }
 
 // 关注或取消关注

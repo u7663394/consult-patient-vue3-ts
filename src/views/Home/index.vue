@@ -41,7 +41,11 @@ const consultStore = useConsultStore() // consult 仓库
           </router-link>
         </van-col>
         <van-col span="8">
-          <router-link to="/" class="nav">
+          <router-link
+            to="/consult/medicine"
+            class="nav"
+            @click="consultStore.setType(ConsultType.Medication)"
+          >
             <cp-icon name="home-prescribe"></cp-icon>
             <p class="title">开药门诊</p>
             <p class="desc">线上买药更方便</p>

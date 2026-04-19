@@ -1,5 +1,14 @@
-import { ConsultType, IllnessTime, OrderType } from '@/enums/index'
+import type { Medical } from './room'
 import type { Patient } from './user'
+import type {
+  AllergicHistory,
+  ConsultType,
+  FertilityStatus,
+  IllnessTime,
+  LiverFunction,
+  OrderType,
+  RenalFunction,
+} from '@/enums/index'
 
 // 文章信息类型
 export type Knowledge = {
@@ -19,15 +28,17 @@ export type Knowledge = {
   creatorId: string
 }
 
+export type BasePage<T = unknown> = {
+  pageTotal: number
+  total: number
+  rows: T
+}
+
 // 文章列表
 export type KnowledgeList = Knowledge[]
 
 // 文章列表分页
-export type KnowledgePage = {
-  pageTotal: number
-  total: number
-  rows: KnowledgeList
-}
+export type KnowledgePage = BasePage<KnowledgeList>
 
 // 联合类型
 export type KnowledgeType = 'like' | 'recommend' | 'fatReduction' | 'food'
@@ -63,11 +74,7 @@ export type Doctor = {
 export type DoctorList = Doctor[]
 
 // 医生分页
-export type DoctorPage = {
-  pageTotal: number
-  total: number
-  rows: DoctorList
-}
+export type DoctorPage = BasePage<DoctorList>
 
 // 关注类型
 export type FollowType = 'doc' | 'knowledge' | 'topic' | 'disease'
@@ -88,6 +95,11 @@ export type Consult = {
   illnessTime: IllnessTime
   consultFlag: 0 | 1 // 是否就诊过，0 未就诊过  1 就诊过
   pictures: Image[]
+  liverFunction: LiverFunction
+  renalFunction: RenalFunction
+  allergicHistory: AllergicHistory
+  fertilityStatus: FertilityStatus
+  medicines: Medical[]
   patientId: string
   couponId: string // 优惠券ID
 }
@@ -121,6 +133,16 @@ export type TopDep = SubDep & {
 export type ConsultIllness = Pick<
   PartialConsult,
   'illnessDesc' | 'illnessTime' | 'consultFlag' | 'pictures'
+>
+
+export type MedicineIllness = Pick<
+  PartialConsult,
+  | 'illnessDesc'
+  | 'liverFunction'
+  | 'renalFunction'
+  | 'allergicHistory'
+  | 'fertilityStatus'
+  | 'pictures'
 >
 
 // 问诊订单预支付传参
@@ -179,4 +201,33 @@ export type ConsultOrderPage = {
   pageTotal: number
   total: number
   rows: ConsultOrderItem[]
+}
+
+export type MedicineParams = PageParams & {
+  keyword: string
+}
+
+export type MedicineList = Medical[]
+
+export type MedicinePage = BasePage<MedicineList>
+
+export type MedicineDetail = Medical & {
+  brand: string
+  brandId?: string
+  manufacturer: string
+  approvalNo: string
+  expiration: string
+  classify: string
+  classifyId: string
+  indicationsFunction: string
+  contraindication: string
+  untowardReaction: string
+  preparation: string
+  standard: string
+  mainPictures: string[]
+  creator: string
+  updator: string
+  createTime: string
+  updateTime: string
+  deleteState: number
 }

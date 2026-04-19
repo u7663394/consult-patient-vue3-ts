@@ -7,8 +7,16 @@ import { useUserStore } from '@/stores'
 import dayjs from 'dayjs'
 import EvaluateCard from './EvaluateCard.vue'
 import { useShowPrescription } from '@/composables'
-import { getConsultFlagText, getIllnessTimeText } from '@/utils/filter'
-import { useRouter } from 'vue-router'
+import {
+  getAllergicHistoryText,
+  getConsultFlagText,
+  getFertilityStatusText,
+  getIllnessTimeText,
+  getLiverFunctionText,
+  getRenalFunctionText,
+} from '@/utils/filter'
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 const userStore = useUserStore()
 
 /**
@@ -44,6 +52,8 @@ const { showPrescription } = useShowPrescription()
  *   3. 已支付则跳转订单详情页面
  */
 const router = useRouter()
+const route = useRoute()
+const fromPage = computed(() => route.query.from)
 const buy = (pre?: Prescription) => {
   if (pre) {
     if (pre.status === PrescriptionStatus.Invalid) return showToast('处方已失效')
@@ -64,7 +74,13 @@ const buy = (pre?: Prescription) => {
         {{ item.msg.consultRecord?.patientInfo.genderValue }}
         {{ item.msg.consultRecord?.patientInfo.age }}岁
       </p>
-      <p>
+      <p v-if="fromPage === 'medicine'">
+        肝功能 {{ getLiverFunctionText(item.msg.consultRecord?.liverFunction!) }} | 肾功能
+        {{ getRenalFunctionText(item.msg.consultRecord?.renalFunction!) }} | 过敏史
+        {{ getAllergicHistoryText(item.msg.consultRecord?.allergicHistory!) }} | 生育状态
+        {{ getFertilityStatusText(item.msg.consultRecord?.fertilityStatus!) }}
+      </p>
+      <p v-else>
         {{ getIllnessTimeText(item.msg.consultRecord?.illnessTime!) }} |
         {{ getConsultFlagText(item.msg.consultRecord?.consultFlag!) }}
       </p>
@@ -72,6 +88,16 @@ const buy = (pre?: Prescription) => {
     <van-row>
       <van-col span="6">病情描述</van-col>
       <van-col span="18">{{ item.msg.consultRecord?.illnessDesc }}</van-col>
+      <template v-if="fromPage === 'medicine'">
+        <van-col span="6">用药需求</van-col>
+        <van-col span="18">
+          {{
+            item.msg.consultRecord?.medicines
+              ?.map((med) => `${med.name} ${med.specs} x${med.quantity}`)
+              .join('，') || '暂无'
+          }}
+        </van-col>
+      </template>
       <van-col span="6">图片</van-col>
       <van-col
         v-if="item.msg.consultRecord?.pictures?.length"
