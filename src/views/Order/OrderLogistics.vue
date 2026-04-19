@@ -3,6 +3,7 @@ import { getMedicalOrderLogistics } from '@/services/order'
 import type { Logistics } from '@/types/order'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import AMapLoader from '@amap/amap-jsapi-loader'
 
 /**
  * 获取并渲染物流信息
@@ -12,6 +13,53 @@ const route = useRoute()
 onMounted(async () => {
   const res = await getMedicalOrderLogistics(route.params.id as string)
   logistics.value = res.data
+})
+
+/**
+ * 使用高德地图
+ *   1. 引入安全配置，设置 securityJsCode
+ *   2. 使用 AMapLoader 加载地图，传入 key 和 version
+ *   3. 在 then 回调中使用 AMap 初始化地图
+ *   4. 绘制物流轨迹
+ */
+window._AMapSecurityConfig = {
+  securityJsCode: '415e917da833efcf2d5b69f4d821784b',
+}
+// 2. 加载高德地图
+onMounted(async () => {
+  AMapLoader.load({
+    key: '4eed3d61125c8b9c168fc22414aaef7e',
+    version: '2.0',
+  }).then((AMap) => {
+    // 3. 使用 Amap 初始化地图
+    const map = new AMap.Map('map', {
+      mapStyle: 'amap://styles/whitesmoke',
+      zoom: 12,
+    })
+    // 4. 绘制物流轨迹
+    AMap.plugin('AMap.Driving', function () {
+      const driving = new AMap.Driving({
+        map: map,
+        showTraffic: false, // 不显示路况
+        hideMarkers: true, // 隐藏默认标记
+      })
+      if (logistics.value?.logisticsInfo && logistics.value.logisticsInfo.length >= 2) {
+        const pathList = [...logistics.value.logisticsInfo]
+        const start = pathList.shift() // 起点
+        const end = pathList.pop() // 终点
+        driving.search(
+          [start?.longitude, start?.latitude],
+          [end?.longitude, end?.latitude],
+          {
+            waypoints: pathList.map((ele) => [ele.longitude, ele.latitude]),
+          },
+          () => {
+            // 规划完毕回调
+          },
+        )
+      }
+    })
+  })
 })
 </script>
 
