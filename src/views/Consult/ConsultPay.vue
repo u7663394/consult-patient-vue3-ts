@@ -2,6 +2,8 @@
 import { createConsultOrder, getConsultOrderPayUrl, getConsultOrderPre } from '@/services/consult'
 import { getPatientDetail } from '@/services/user'
 import { useConsultStore } from '@/stores'
+import { ConsultType } from '@/enums'
+import { getCreateOrderParams } from '@/utils/createOrderParams'
 import type { ConsultOrderPreData, PartialConsult } from '@/types/consult'
 import type { Patient } from '@/types/user'
 import { showConfirmDialog, showDialog, showLoadingToast, showToast } from 'vant'
@@ -19,16 +21,17 @@ const consultStore = useConsultStore()
 const payInfo = ref<ConsultOrderPreData>()
 // 发请求
 const loadData = async () => {
-  const res = await getConsultOrderPre({
+  const params = {
     type: consultStore.consult.type,
     illnessType: consultStore.consult.illnessType,
-  })
+    docId: consultStore.consult.docId,
+  }
+  const res = await getConsultOrderPre(params)
   // 赋值
   payInfo.value = res.data
   // 记录优惠券 ID
   consultStore.setCoupon(res.data.couponId)
 }
-loadData()
 
 /**
  * 获取患者信息
@@ -41,7 +44,6 @@ const loadPatient = async () => {
   const res = await getPatientDetail(consultStore.consult.patientId!)
   patient.value = res.data
 }
-loadPatient()
 
 /**
  * 生成订单
@@ -61,7 +63,9 @@ const onSubmit = async () => {
   if (!agree.value) return showToast('请同意支付协议')
   // 2. 发送生成订单请求
   loading.value = true
-  const res = await createConsultOrder(consultStore.consult)
+  const type = consultStore.consult.type
+  const params = getCreateOrderParams(consultStore.consult, type)
+  const res = await createConsultOrder(params)
   // 3. 接受订单 ID
   orderId.value = res.data.id
   loading.value = false
@@ -114,6 +118,9 @@ onMounted(() => {
     'consultFlag',
     'patientId',
   ]
+  if (consultStore.consult.type === ConsultType.Doctor) {
+    validKeys.push('docId')
+  }
   // 所有值都不是 undefined 才 return true
   const valid = validKeys.every((key) => {
     return consultStore.consult[key] !== undefined
@@ -127,6 +134,8 @@ onMounted(() => {
       router.push('/')
     })
   }
+  loadData()
+  loadPatient()
 })
 
 /**
@@ -154,7 +163,7 @@ const onPay = async () => {
   const res = await getConsultOrderPayUrl({
     orderId: orderId.value,
     paymentMethod: paymentMethod.value,
-    payCallback: 'http://localhost:5173/room',
+    payCallback: `${window.location.origin}/room`,
   })
   // 4. 成功则跳转支付链接
   window.location.href = res.data.payUrl

@@ -5,11 +5,13 @@ import type {
   ConsultOrderPreData,
   ConsultOrderPreParams,
   DoctorPage,
+  DoctorParams,
   EvalParams,
   FollowType,
   Image,
   KnowledgePage,
   KnowledgeParams,
+  Area,
   MedicineDetail,
   MedicinePage,
   MedicineParams,
@@ -28,6 +30,21 @@ export const getKnowledgePage = (params: KnowledgeParams) => {
 // 获取医生列表
 export const getDoctorPage = (params: PageParams) => {
   return request<DoctorPage>('/home/page/doc', 'GET', params)
+}
+
+// 获取医生分页列表
+export const getFindDoctorPage = (params: DoctorParams) => {
+  return request<DoctorPage>('/patient/search/doc', 'GET', params)
+}
+
+// 获取医生详情
+export const getDoctorDetail = (id: string) => {
+  return request<import('@/types/consult').Doctor>('doc/detail', 'GET', { docId: id })
+}
+
+// 获取所有省市区
+export const getAllBasicArea = () => {
+  return request<Area[]>('/basicArea/all')
 }
 
 // 获取药品分页列表

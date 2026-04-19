@@ -23,7 +23,11 @@ const consultStore = useConsultStore() // consult 仓库
       <!-- 两行, 第一行 3 列, 第二行 4 列 -->
       <van-row>
         <van-col span="8">
-          <router-link to="/" class="nav">
+          <router-link
+            to="/consult/doctor"
+            class="nav"
+            @click="consultStore.setType(ConsultType.Doctor)"
+          >
             <cp-icon name="home-doctor"></cp-icon>
             <p class="title">问医生</p>
             <p class="desc">按科室查问医生</p>

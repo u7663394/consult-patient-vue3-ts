@@ -34,6 +34,22 @@ export enum FertilityStatus {
   Breastfeeding,
 }
 
+// 职称
+export enum PositionalTitles {
+  ChiefPhysician,
+  AssociateChiefPhysician,
+  AttendingPhysician,
+  Physician,
+}
+
+// 价格区间
+export enum PriceRange {
+  ZeroToNineteen = '0_19',
+  TwentyToFortyNine = '20_49',
+  FiftyToSeventyNine = '50_79',
+  MoreThanEighty = '80',
+}
+
 // 问诊时间
 export enum IllnessTime {
   Week = 1,

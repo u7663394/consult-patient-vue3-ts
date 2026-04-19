@@ -7,6 +7,8 @@ import type {
   IllnessTime,
   LiverFunction,
   OrderType,
+  PositionalTitles,
+  PriceRange,
   RenalFunction,
 } from '@/enums/index'
 
@@ -70,6 +72,21 @@ export type Doctor = {
   major: string
 }
 
+export type DoctorOrderType =
+  | 'default_ascend'
+  | 'score_ascend'
+  | 'consultationNum_ascend'
+  | 'serviceFee_ascend'
+
+export type DoctorParams = PageParams & {
+  provinceId: string
+  depId: string
+  order: DoctorOrderType
+  grade?: string
+  positionalTitles?: PositionalTitles
+  priceRange?: PriceRange
+}
+
 // 医生列表
 export type DoctorList = Doctor[]
 
@@ -100,6 +117,7 @@ export type Consult = {
   allergicHistory: AllergicHistory
   fertilityStatus: FertilityStatus
   medicines: Medical[]
+  docId: string
   patientId: string
   couponId: string // 优惠券ID
 }
@@ -117,6 +135,7 @@ export type PartialConsult = Partial<Consult>
 export type SubDep = {
   id: string
   name: string
+  avatar?: string
 }
 
 // 一级科室
@@ -146,7 +165,7 @@ export type MedicineIllness = Pick<
 >
 
 // 问诊订单预支付传参
-export type ConsultOrderPreParams = Pick<PartialConsult, 'type' | 'illnessType'>
+export type ConsultOrderPreParams = Pick<PartialConsult, 'type' | 'illnessType' | 'docId'>
 
 // 问诊订单预支付信息
 export type ConsultOrderPreData = {
@@ -230,4 +249,18 @@ export type MedicineDetail = Medical & {
   createTime: string
   updateTime: string
   deleteState: number
+}
+
+// 城市
+export type City = {
+  id: string
+  parentId: string
+  name: string
+}
+
+export type Area = {
+  id: string
+  parentId: string
+  name: string
+  citys?: City[]
 }

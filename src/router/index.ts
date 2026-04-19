@@ -54,6 +54,11 @@ const router = createRouter({
       meta: { title: '极速问诊' },
     },
     {
+      path: '/consult/doctor',
+      component: () => import('@/views/Consult/ConsultDoctor.vue'),
+      meta: { title: '找医生' },
+    },
+    {
       path: '/consult/dep',
       component: () => import('@/views/Consult/ConsultDep.vue'),
       meta: { title: '选择科室' },
@@ -77,6 +82,16 @@ const router = createRouter({
       path: '/medicineDetail/:id',
       component: () => import('@/views/Consult/ConsultMedicineDetail.vue'),
       meta: { title: '药品详情' },
+    },
+    {
+      path: '/doctorList/:depId',
+      component: () => import('@/views/Consult/ConsultDoctorList.vue'),
+      meta: { title: '医生搜索' },
+    },
+    {
+      path: '/doctorDetail/:id',
+      component: () => import('@/views/Consult/ConsultDoctorDetail.vue'),
+      meta: { title: '医生详情' },
     },
     {
       path: '/consult/pay',

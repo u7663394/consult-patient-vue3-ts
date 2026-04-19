@@ -7,6 +7,8 @@ const commonKeys: Key[] = ['type', 'illnessDesc', 'patientId', 'pictures']
 
 const fastKeys: Key[] = [...commonKeys, 'depId', 'illnessTime', 'consultFlag']
 
+const doctorKeys: Key[] = [...fastKeys, 'docId']
+
 const medicineKeys: Key[] = [
   ...commonKeys,
   'allergicHistory',
@@ -28,12 +30,15 @@ export const getCreateOrderParams = (
         params[key] = consult[key]
       })
       break
+    case ConsultType.Doctor:
+      doctorKeys.forEach((key) => {
+        params[key] = consult[key]
+      })
+      break
     case ConsultType.Medication:
       medicineKeys.forEach((key) => {
         params[key] = consult[key]
       })
-      break
-    case ConsultType.Doctor:
       break
   }
 

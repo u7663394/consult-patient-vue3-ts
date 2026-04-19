@@ -41,7 +41,11 @@ export const useConsultStore = defineStore(
     const setPatient = (patientId: string) => {
       consult.value.patientId = patientId
     }
-    // 6.1 记录药品
+    // 6.1 记录医生
+    const setDocId = (docId: string) => {
+      consult.value.docId = docId
+    }
+    // 6.2 记录药品
     const setMedicines = (medicines: Medical[]) => {
       consult.value.medicines = medicines
     }
@@ -62,6 +66,7 @@ export const useConsultStore = defineStore(
       setIllness,
       setMedicineIllness,
       setPatient,
+      setDocId,
       setMedicines,
       setCoupon,
       clear,
