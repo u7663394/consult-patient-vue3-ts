@@ -137,7 +137,7 @@ router.beforeEach((to) => {
  * 路由后置守卫 -> 页面标题设置
  */
 router.afterEach((to) => {
-  document.title = `${to.meta.title || ''}-优医问诊`
+  document.title = `${to.meta.title || ''}-${import.meta.env.VITE_APP_TITLE}`
   NProgress.done()
 })
 
