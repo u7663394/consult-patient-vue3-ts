@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { getMedicalOrderLogistics } from '@/services/order'
-import type { Logistics } from '@/types/order'
+import type { Location, Logistics } from '@/types/order'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import AMapLoader from '@amap/amap-jsapi-loader'
+import carImg from '@/assets/car.png'
+import startImg from '@/assets/start.png'
+import endImg from '@/assets/end.png'
 
 /**
  * 获取并渲染物流信息
@@ -44,9 +47,27 @@ onMounted(async () => {
         hideMarkers: true, // 隐藏默认标记
       })
       if (logistics.value?.logisticsInfo && logistics.value.logisticsInfo.length >= 2) {
+        // 自定义标记函数
+        const getMarker = (point: Location, image: string, width = 25, height = 30) => {
+          const icon = new AMap.Icon({
+            size: new AMap.Size(width, height),
+            image,
+            imageSize: new AMap.Size(width, height),
+          })
+          const marker = new AMap.Marker({
+            position: [point?.longitude, point?.latitude],
+            icon: icon,
+            offset: new AMap.Pixel(-width / 2, -height),
+          })
+          return marker
+        }
         const pathList = [...logistics.value.logisticsInfo]
         const start = pathList.shift() // 起点
+        const startMarker = getMarker(start!, startImg)
+        map.add(startMarker)
         const end = pathList.pop() // 终点
+        const endMarker = getMarker(end!, endImg)
+        map.add(endMarker)
         driving.search(
           [start?.longitude, start?.latitude],
           [end?.longitude, end?.latitude],
@@ -55,6 +76,14 @@ onMounted(async () => {
           },
           () => {
             // 规划完毕回调
+            const currPoint = logistics.value?.currentLocationInfo
+            const currMarker = getMarker(currPoint!, carImg, 33, 20)
+            map.add(currMarker)
+            // 3s 后定位到中间并缩放
+            setTimeout(() => {
+              map.setFitView([currMarker])
+              map.setZoom(10)
+            }, 3000)
           },
         )
       }
