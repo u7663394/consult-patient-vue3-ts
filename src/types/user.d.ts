@@ -39,3 +39,10 @@ export type Patient = {
 
 // 患者信息列表
 export type PatientList = Patient[]
+
+// 绑定手机号参数类型
+export type BindMobileParams = {
+  mobile: string
+  code: string
+  openId: string
+}

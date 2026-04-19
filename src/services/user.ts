@@ -1,4 +1,4 @@
-import type { CodeType, Patient, PatientList, User, UserInfo } from '@/types/user'
+import type { BindMobileParams, CodeType, Patient, PatientList, User, UserInfo } from '@/types/user'
 import { request } from '@/utils/request'
 
 // 密码登陆
@@ -57,4 +57,9 @@ export const loginByQQ = (openId: string) => {
     openId,
     source: 'qq',
   })
+}
+
+// 绑定手机号
+export const bindMobile = (data: BindMobileParams) => {
+  return request<User>('/login/binding', 'POST', data)
 }
