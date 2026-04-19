@@ -9,6 +9,8 @@ import { VantResolver } from 'unplugin-vue-components/resolvers'
 // 打包 svg 地图
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import path from 'path'
+// Mock 插件
+import { viteMockServe } from 'vite-plugin-mock'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -20,6 +22,10 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     createHtmlPlugin(),
+    viteMockServe({
+      mockPath: './src/mock',
+      enable: true,
+    }),
     Components({
       // 不自动生成组件类型文件
       dts: false,
