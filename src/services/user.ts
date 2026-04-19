@@ -50,3 +50,11 @@ export const getPatientDetail = (id: string) => {
 export const getUnreadMsgCount = () => {
   return request<number>('patient/message/unRead/all')
 }
+
+// QQ 登录
+export const loginByQQ = (openId: string) => {
+  return request<User>('/login/thirdparty', 'POST', {
+    openId,
+    source: 'qq',
+  })
+}
