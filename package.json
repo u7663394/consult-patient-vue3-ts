@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test": "vitest",
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
@@ -62,6 +63,7 @@
     "vite-plugin-mock": "^3.0.2",
     "vite-plugin-svg-icons": "^2.0.1",
     "vite-plugin-vue-devtools": "^8.1.1",
+    "vitest": "^4.1.4",
     "vue-tsc": "^3.2.6"
   },
   "engines": {
