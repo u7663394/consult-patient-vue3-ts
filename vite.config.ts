@@ -1,3 +1,9 @@
+/// <reference types="vitest/config" />
+/**
+ * TS 先读取三斜线预处理指令
+ * 必须放在文件的最顶部
+ */
+
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -17,6 +23,9 @@ export default defineConfig({
   server: {
     port: 80,
     host: true,
+  },
+  test: {
+    environment: 'happy-dom',
   },
   plugins: [
     vue(),
