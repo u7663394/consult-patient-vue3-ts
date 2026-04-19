@@ -118,7 +118,7 @@ const router = createRouter({
  *   2. return '/path': 重定向到指定路径
  *   3. return undefined or true: 放行
  */
-const wihteList = ['/login']
+const wihteList = ['/login', '/login/callback']
 router.beforeEach((to) => {
   NProgress.start()
   // 没有 token 且不访问白名单 -> 重定向到登录页
